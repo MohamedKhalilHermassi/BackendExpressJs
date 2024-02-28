@@ -3,6 +3,7 @@ const logger = require('morgan');
 const createEroor = require('http-errors');
 const mongoose = require('mongoose');
 const config = require('./database/dbConfig.json');
+const cors = require('cors');
 const app = express();
 
 const PORT = process.env.PORT || 3000;
@@ -11,6 +12,12 @@ const courseRouter = require('./routes/courseRoute');
 const classroomRouter = require('./routes/classroomRoute');
 const examRouter = require('./routes/examRoute');
 const sessionRouter = require('./routes/sessionRoute');
+
+app.use(express.json());
+app.use(cors({
+  credentials:true,
+  origin:'*' 
+}));
 
 app.use('/courses', courseRouter);
 app.use('/classrooms', classroomRouter);
