@@ -10,9 +10,8 @@ const Course = new Schema({
     },
     description: {
         type: String,
-        required: true,
     },
-    price: {
+    hourly_based_price: {
         type: Number,
         required: true,
     },

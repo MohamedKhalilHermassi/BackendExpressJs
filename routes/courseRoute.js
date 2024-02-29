@@ -16,7 +16,7 @@ router.put('/:id',async(req, res, next) =>{
     await Course.findByIdAndUpdate(req.params.id,{
         name: req.body.name,
         description: req.body.description,
-        price: req.body.price,
+        hourly_based_price: req.body.price,
         courseType: req.body.courseType,
         level: req.body.level
     })
@@ -32,7 +32,7 @@ router.post('/add', async(req, res, next) => {
     const course = new Course({
         name: req.body.name,
         description: req.body.description,
-        price: req.body.price,
+        hourly_based_price: req.body.price,
         courseType: req.body.courseType,
         level: req.body.level
     });
