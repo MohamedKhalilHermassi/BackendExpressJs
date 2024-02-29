@@ -16,6 +16,7 @@ async function createAdminUserIfNotExists() {
           adress: 'Admin Address',
           phone: '123456789',
           birthday: '1999-01-01',
+          image: "uploads\\administrateur.png",
           status: true
         });
   

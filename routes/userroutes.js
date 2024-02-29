@@ -3,7 +3,21 @@ const router = express.Router()
 const User = require('../models/user')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const multer = require('multer')
+const path = require('path')
+const config = require('../database/dbConfig.json');
 const { authenticateToken, authorizeUser } = require('./authMiddleware');
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+      cb(null, 'uploads/') 
+  },
+  filename: function (req, file, cb) {
+      cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+  }
+});
+
+// Initialiser l'instance multer avec la configuration de stockage
+const upload = multer({ storage: storage });
 // Login
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
@@ -15,7 +29,7 @@ router.post('/login', async (req, res) => {
       }else if (user.status==false) {
         return res.status(403).json({ message: 'Access denied' });
       } else {
-        const token = jwt.sign({ email: user.email, role: user.role }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ email: user.email, role: user.role }, config.token.secret, { expiresIn: '1h' });
         res.json({ token });
       }
     } catch (err) {
@@ -39,7 +53,7 @@ router.get('/OneUser/:email',authenticateToken, getuser, (req, res) => {
 })
 
 // Creating one
-router.post('/register', async (req, res) => {
+router.post('/register',upload.single('image'), async (req, res) => {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const  email=req.body.email
   const user = new User({
@@ -50,6 +64,7 @@ router.post('/register', async (req, res) => {
     adress: req.body.adress,
     phone: req.body.phone,
     birthday: req.body.birthday,
+    image: req.file ? req.file.path : null
   })
   try {
     if((await User.findOne({ email }))!=null){
@@ -68,7 +83,7 @@ router.post('/register', async (req, res) => {
 })
 
 // Patching One
-router.patch('/UpdatingUser/:email',authenticateToken, getuser, async (req, res) => {
+router.patch('/UpdatingUser/:email',authenticateToken,upload.single('image'), getuser, async (req, res) => {
   if (req.body.fullname != null) {
     res.user.fullname = req.body.fullname
   }
@@ -90,6 +105,9 @@ router.patch('/UpdatingUser/:email',authenticateToken, getuser, async (req, res)
   }
   if (req.body.birthday != null) {
     res.user.birthday = req.body.birthday
+  }
+  if(req.file!=null){
+    res.user.image =req.file ? req.file.path : null
   }
   try {
    if(req.body.email !=null){
@@ -118,7 +136,16 @@ router.delete('/DeleteOneUser/:email',authenticateToken ,authorizeUser('admin'),
     res.status(500).json({ message: err.message })
   }
 })
-
+//ban user 
+router.put('/BanUser/:email',authenticateToken ,authorizeUser('admin'),getuser, async (req, res) => {
+  try {
+    res.user.status=!res.user.status
+    const updatedUser = await res.user.save()
+    res.json(updatedUser)
+  } catch (err) {
+    res.status(400).json({ message: err.message })
+  }
+})
 async function getuser(req, res, next) {
   let user
   try {

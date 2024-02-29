@@ -35,6 +35,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     default:true
   },
+  image: {
+    type: String,
+    required: true,
+  },
 })
 
 module.exports = mongoose.model('user', userSchema)
