@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { productCondition } = require('../shared/enums');
+const { productCondition,productType } = require('../shared/enums');
 
 const Schema = mongoose.Schema;
 
@@ -25,6 +25,11 @@ const Product = new Schema({
         type : Boolean,
         required: true,
         
+    },
+    productType:{
+        type : String,
+        required: true,
+        enum : Object.values(productType),
     },
     filename: {
         type:String,

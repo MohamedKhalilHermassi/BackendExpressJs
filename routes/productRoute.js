@@ -26,6 +26,7 @@ router.post('/add-product', upload.single('image'), async (req, res) => {
       productDescription: productData.description,
       productPrice: productData.price,
       productCondition: productData.condition,
+      productType:productData.type,
       productAvailability: true,
       filename: req.file.filename, 
 
