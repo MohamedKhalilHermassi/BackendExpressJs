@@ -12,14 +12,6 @@ const { createAdminUserIfNotExists } = require('./routes/DataInitializer');
 const app = express();
 app.use(cors(config.cors.options));
 
-
-
-
-
-
-
-
-
 mongoose.connect(config.mongo.uri)
 const db = mongoose.connection
 db.on('error', (error) => console.error(error))
