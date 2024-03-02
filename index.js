@@ -43,7 +43,6 @@ app.use('/courses', courseRouter);
 app.use('/classrooms', classroomRouter);
 app.use('/exams', examRouter);
 app.use('/sessions', sessionRouter);
-app.listen(3000, () => console.log('Server Started'))
 
 //gestion magasin
 app.use('/market',productRouter)
