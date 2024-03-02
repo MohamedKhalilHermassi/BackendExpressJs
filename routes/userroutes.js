@@ -29,7 +29,7 @@ router.post('/login', async (req, res) => {
       }else if (user.status==false) {
         return res.status(403).json({ message: 'Access denied' });
       } else {
-        const token = jwt.sign({ email: user.email, role: user.role }, config.token.secret, { expiresIn: '1h' });
+        const token = jwt.sign({ email: user.email, role: user.role, id:user.id }, config.token.secret, { expiresIn: '1h' });
         res.json({ token });
       }
     } catch (err) {
