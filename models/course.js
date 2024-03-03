@@ -25,6 +25,9 @@ const Course = new Schema({
         required: true,
         enum : Object.values(level)
     },
+    image:{
+        type : String,
+    },
     sessions : [{
         type: Schema.Types.ObjectId,
         ref: 'Session'

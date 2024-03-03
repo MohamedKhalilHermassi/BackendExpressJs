@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Course = require('../models/course');
+const upload = require('../shared/multer');
 
 router.get('/', async(req, res, next) => {
     const courses = await Course.find();
@@ -28,7 +29,8 @@ router.delete('/:id', async(req, res, next) => {
     res.json({'message': 'Course Deleted'})
 })
 
-router.post('/add', async(req, res, next) => {
+router.post('/add',upload.single('file'), async(req, res, next) => {
+    console.log(req.file);
     const course = new Course({
         name: req.body.name,
         description: req.body.description,
