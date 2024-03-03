@@ -1,11 +1,13 @@
-const courseType = {
-    solfege : 'Solfege',
-    instrument : 'Instrument',
-};
-Object.freeze(courseType);
 
+const Status = {
+    incoming : 'Incoming',
+    finished : 'Finished',
+    canceled : 'Canceled',
+};
+
+Object.freeze(Status);
 
 
 module.exports ={
-    courseType,
+    Status,
 };
