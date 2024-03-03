@@ -1,5 +1,5 @@
 {
     "mongo":{
-        "uri": "mongodb://localhost:27017/ElKindy"
+        "uri": "mongodb://localhost:27017/elkindy"
     }
 }
