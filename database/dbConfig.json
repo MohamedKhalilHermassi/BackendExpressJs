@@ -13,5 +13,10 @@
     "email":{
         "email":"elfadanes@gmail.com",
         "pwd":"dkztciotkzncaxwi"
+    },
+    "twilio":{
+        "id":"ACe04daf6bad40055ff4b3d133197085fd",
+        "token":"b8fda674b2e68f1c9366bb6b519a56ab",
+        "num":"+14325355571"
     }
 }

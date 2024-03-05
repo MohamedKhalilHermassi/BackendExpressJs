@@ -8,6 +8,7 @@ const path = require('path')
 const config = require('../database/dbConfig.json');
 const { authenticateToken, authorizeUser } = require('./authMiddleware');
 const nodemailer = require('nodemailer');
+const twilio =require('twilio');
 let transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -97,6 +98,23 @@ router.post('/register', upload.single('image'), async (req, res) => {
           text: `Hello ${user.fullname}, your account is being set up. To complete your registration, please verify your account. Your verification code is: ${verificationCode}`
         });
 
+         // Send SMS verification (optional)
+    if (user.phone) { // Send only if phone number is provided
+      try {
+        const client = new twilio(config.twilio.id, config.twilio.token);
+        const message = `Hello ${user.fullname}, your account is being set up. To complete your registration, please verify your account. Your verification code is: ${verificationCode}`;
+
+        await client.messages.create({
+          body: message,
+          to: `+216${user.phone}`, // Add country code to phone number
+          from: config.twilio.num,
+        });
+
+        console.log('SMS verification sent successfully');
+      } catch (error) {
+        console.error('Error sending SMS verification:', error);
+      }
+    }
       
       const newUser = await user.save();
       
