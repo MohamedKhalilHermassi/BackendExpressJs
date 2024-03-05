@@ -142,7 +142,67 @@ router.post('/verify-user', async (req, res) => {
       res.status(500).json({ message: err.message });
   }
 });
+router.post('/forgetpassword', async (req, res) => {
+  const  email   = req.body.email;
 
+  try {
+      const user = await User.findOne({ email });
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+      const verificationCode = Math.floor(100000 + Math.random() * 900000); 
+      user.verificationCode=verificationCode;
+      await transporter.sendMail({
+        from: config.email.email,
+        to: req.body.email,
+        subject: 'Forgot Password',
+        text: `Hello ${user.fullname},  Your verification code is: ${verificationCode}`
+      });
+
+       // Send SMS verification (optional)
+  if (user.phone) { // Send only if phone number is provided
+    try {
+      const client = new twilio(config.twilio.id, config.twilio.token);
+      const message = `Hello ${user.fullname}, Your verification code is: ${verificationCode}`;
+
+      await client.messages.create({
+        body: message,
+        to: `+216${user.phone}`, 
+        from: config.twilio.num,
+      });
+
+      console.log('SMS verification sent successfully');
+    } catch (error) {
+      console.error('Error sending SMS verification:', error);
+    }
+  }
+      
+      await user.save();
+      res.status(200).json({ message: 'successfully' });
+  } catch (err) {
+      res.status(500).json({ message: err.message });
+  }
+});
+router.post('/verify-forgetpassword', async (req, res) => {
+  const { email, verificationCode ,password } = req.body;
+
+  try {
+      const user = await User.findOne({ email });
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+      if (user.verificationCode !== verificationCode) {
+          return res.status(400).json({ message: 'Incorrect verification code' });
+      }
+      user.verificationCode = null;
+      const hashedPassword = await bcrypt.hash(password, 10);
+      user.password=hashedPassword;
+      await user.save();
+      res.status(200).json({ message: 'User updated successfully' });
+  } catch (err) {
+      res.status(500).json({ message: err.message });
+  }
+});
 // Patching One
 router.patch('/UpdatingUser/:email',authenticateToken,upload.single('image'), getuser, async (req, res) => {
   if (req.body.fullname != null) {
