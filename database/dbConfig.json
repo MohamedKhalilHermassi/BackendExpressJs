@@ -9,5 +9,9 @@
     "cors":{
         "options":"http://localhost:5173"
 
+    },
+    "email":{
+        "email":"elfadanes@gmail.com",
+        "pwd":"dkztciotkzncaxwi"
     }
 }

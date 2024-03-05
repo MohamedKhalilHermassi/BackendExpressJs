@@ -7,6 +7,14 @@ const multer = require('multer')
 const path = require('path')
 const config = require('../database/dbConfig.json');
 const { authenticateToken, authorizeUser } = require('./authMiddleware');
+const nodemailer = require('nodemailer');
+let transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+      user: config.email.email,
+      pass: config.email.pwd
+  }
+});
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
       cb(null, 'uploads/') 
@@ -25,9 +33,12 @@ router.post('/login', async (req, res) => {
     try {
       const user = await User.findOne({ email });
       if (!user || !bcrypt.compareSync(password, user.password)) {
-        return res.status(401).json({ message: 'Invalid email or password' });
+        return res.status(400).json({ message: 'Invalid email or password' });
       }else if (user.status==false) {
         return res.status(403).json({ message: 'Access denied' });
+      }
+      else if (user.verificationCode!=null) {
+        return res.status(401).json({ message: 'Please verify your account' });
       } else {
         const token = jwt.sign({ email: user.email, role: user.role, id:user.id }, config.token.secret, { expiresIn: '1h' });
         res.json({ token });
@@ -53,34 +64,66 @@ router.get('/OneUser/:email',authenticateToken, getuser, (req, res) => {
 })
 
 // Creating one
-router.post('/register',upload.single('image'), async (req, res) => {
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    const  email=req.body.email
-  const user = new User({
-    fullname: req.body.fullname,
-    email: email,
-    password: hashedPassword,
-    role: "Student",
-    adress: req.body.adress,
-    phone: req.body.phone,
-    birthday: req.body.birthday,
-    image: req.file ? req.file.path : null
-  })
+router.post('/register', upload.single('image'), async (req, res) => {
   try {
-    if((await User.findOne({ email }))!=null){
-        if(user.email==(await User.findOne({ email })).email){
-            res.status(302).json({ message: 'email exist' })
-        }
-    }
-   else{
-        const newUser = await user.save()
-        res.status(201).json(newUser)
-    }
-    
+      // Check if email already exists
+      const existingUser = await User.findOne({ email: req.body.email });
+      if (existingUser) {
+          return res.status(302).json({ message: 'Email already exists' });
+      }
+
+      
+      const verificationCode = Math.floor(100000 + Math.random() * 900000); 
+
+      
+      const hashedPassword = await bcrypt.hash(req.body.password, 10);
+      const user = new User({
+          fullname: req.body.fullname,
+          email: req.body.email,
+          password: hashedPassword,
+          role: "Student",
+          adress: req.body.adress,
+          phone: req.body.phone,
+          birthday: req.body.birthday,
+          image: req.file ? req.file.path : null,
+          verificationCode: verificationCode 
+      });
+
+      
+      await transporter.sendMail({
+          from: config.email.email,
+          to: req.body.email,
+          subject: 'Email Verification',
+          text: `Hello ${user.fullname}, your account is being set up. To complete your registration, please verify your account. Your verification code is: ${verificationCode}`
+        });
+
+      
+      const newUser = await user.save();
+      
+      res.status(201).json(newUser);
   } catch (err) {
-    res.status(400).json({ message: err.message })
+      res.status(400).json({ message: err.message });
   }
-})
+});
+
+router.post('/verify-user', async (req, res) => {
+  const { email, verificationCode } = req.body;
+
+  try {
+      const user = await User.findOne({ email });
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+      if (user.verificationCode !== verificationCode) {
+          return res.status(400).json({ message: 'Incorrect verification code' });
+      }
+      user.verificationCode = null;
+      await user.save();
+      res.status(200).json({ message: 'Email verified successfully' });
+  } catch (err) {
+      res.status(500).json({ message: err.message });
+  }
+});
 
 // Patching One
 router.patch('/UpdatingUser/:email',authenticateToken,upload.single('image'), getuser, async (req, res) => {

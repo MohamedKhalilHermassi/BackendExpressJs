@@ -39,6 +39,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  verificationCode: {
+    type: String,
+  },
 })
 
 module.exports = mongoose.model('user', userSchema)
