@@ -40,7 +40,8 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   // relation one to many with products
-  products: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }]
+  products: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+  orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }]
 });
 
 module.exports = mongoose.model('User', userSchema);

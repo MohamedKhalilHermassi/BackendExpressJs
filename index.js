@@ -34,7 +34,7 @@ const sessionRouter = require('./routes/sessionRoute');
 const usersRouter = require('./routes/userroutes')
 app.use('/users', usersRouter)
 const productRouter = require('./routes/productRoute')
-
+const orderRouter = require('./routes/orderRoute')
 app.use(cors());
 
 app.use(express.json())
@@ -47,7 +47,7 @@ app.use('/sessions', sessionRouter);
 //gestion magasin
 app.use('/market',productRouter)
 app.use('/uploads', express.static('uploads'));
-
+app.use('/orders', orderRouter);
 app.get('/', (req, res) => {
   res.send('Hello, Express!');
 });
