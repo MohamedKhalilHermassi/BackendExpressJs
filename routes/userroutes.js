@@ -61,9 +61,10 @@ router.post('/register',upload.single('image'), async (req, res) => {
     email: email,
     password: hashedPassword,
     role: "Student",
-    adress: req.body.adress,
+    address: req.body.adress,
     phone: req.body.phone,
     birthday: req.body.birthday,
+    products : [],
     image: req.file ? req.file.path : null
   })
   try {
@@ -161,5 +162,25 @@ async function getuser(req, res, next) {
   res.user = user
   next()
 }
+
+
+// Route to get a user with their products
+router.get('/user/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    // Find the user by ID and populate the 'products' field
+    const userWithProducts = await User.findById(userId).populate('products');
+
+    if (!userWithProducts) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json(userWithProducts);
+  } catch (error) {
+    console.error('Error fetching user with products:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 module.exports = router

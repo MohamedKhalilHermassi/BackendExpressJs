@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
   fullname: {
@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
     enum: ['Student', 'teacher', 'admin'],
     required: true
   },
-  adress: {
+  address: {
     type: String,
     required: true
   },
@@ -33,12 +33,15 @@ const userSchema = new mongoose.Schema({
   status: {
     type: Boolean,
     required: true,
-    default:true
+    default: true
   },
   image: {
     type: String,
     required: true,
   },
-})
+  // relation one to many with products
+  products: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+  orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }]
+});
 
-module.exports = mongoose.model('user', userSchema)
+module.exports = mongoose.model('User', userSchema);

@@ -5,8 +5,8 @@ const courseType = {
 
 
 const productCondition = {
-    new:'Brand New',
-    used:'Slightly  ',
+    new:'New',
+    used:'Slightly',
     old:'Old'
 }
 

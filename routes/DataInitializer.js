@@ -13,7 +13,7 @@ async function createAdminUserIfNotExists() {
           email: 'admin@Elkindy.com',
           password: hashedPassword,
           role: 'admin',
-          adress: 'Admin Address',
+          address: 'Admin Address',
           phone: '123456789',
           birthday: '1999-01-01',
           image: "uploads\\administrateur.png",
