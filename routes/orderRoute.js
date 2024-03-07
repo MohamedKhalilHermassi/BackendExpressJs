@@ -32,4 +32,24 @@ try {
 
 });
 
+router.get('/get-orders', async (req, res) => {
+    try {
+      
+        const orders = await order.find().populate({
+            path: 'user',
+            select: ['-products','-orders']
+          }).populate({
+            path: 'products',
+            select: ['productName','productPrice']
+          });
+        
+        res.status(200).json(orders);
+    } catch (err) {
+        console.error(err);
+        res.status(400).send(err.message);
+        
+    }
+    
+    });
+
 module.exports = router;
