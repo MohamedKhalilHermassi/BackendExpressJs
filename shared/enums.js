@@ -36,7 +36,7 @@ Object.freeze(productType);
 
 module.exports ={
     courseType,
-    level
+    level,
     productCondition,
     productType
 };
