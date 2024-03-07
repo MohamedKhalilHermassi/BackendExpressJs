@@ -2,6 +2,7 @@ const express = require('express');
 const order = require('../models/order');
 const user = require('../models/user');
 const router = express.Router();
+const { authenticateToken, authorizeUser } = require('./authMiddleware');
 
 
 router.post('/add-order', async (req, res) => {
@@ -32,7 +33,7 @@ try {
 
 });
 
-router.get('/get-orders', async (req, res) => {
+router.get('/get-orders', authenticateToken ,authorizeUser('admin'),async (req, res) => {
     try {
       
         const orders = await order.find().populate({
@@ -40,7 +41,7 @@ router.get('/get-orders', async (req, res) => {
             select: ['-products','-orders']
           }).populate({
             path: 'products',
-            select: ['productName','productPrice']
+            select: ['productName','productPrice','filename']
           });
         
         res.status(200).json(orders);

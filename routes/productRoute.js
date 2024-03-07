@@ -3,6 +3,9 @@ const product = require('../models/product');
 const router = express.Router();
 const multer = require("multer");
 const User = require('../models/user');
+const { authenticateToken, authorizeUser } = require('./authMiddleware');
+
+
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
     cb(null, 'uploads/');
@@ -14,7 +17,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-router.post('/add-product', upload.single('image'), async (req, res) => {
+router.post('/add-product', upload.single('image'),authenticateToken ,authorizeUser('admin'), async (req, res) => {
   try {
     // Parse the JSON data from the form field
     const productData = JSON.parse(req.body.product);
@@ -72,7 +75,7 @@ res.status(200).json(products);
 
 
 // PUT route to update product availability
-router.put('/products/:productId', async (req, res) => {
+router.put('/products/:productId',authenticateToken ,authorizeUser('admin'), async (req, res) => {
   try {
     const { productId } = req.params;
     const { productAvailability } = req.body;
@@ -98,7 +101,7 @@ router.put('/products/:productId', async (req, res) => {
   }
 });
 
-router.put('/archiveProducts/:productId', async (req, res) => {
+router.put('/archiveProducts/:productId',authenticateToken ,authorizeUser('admin'), async (req, res) => {
   try {
     const { productId } = req.params;
     const { archived } = req.body;
