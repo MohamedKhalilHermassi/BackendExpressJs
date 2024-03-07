@@ -35,6 +35,9 @@ const usersRouter = require('./routes/userroutes')
 app.use('/users', usersRouter)
 const productRouter = require('./routes/productRoute')
 
+app.use('/images', express.static('uploads/coursesImages'));
+app.use(express.json());
+
 app.use(cors());
 
 app.use(express.json())

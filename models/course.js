@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const { courseType } = require('../shared/enums');
+const { courseType, level } = require('../shared/enums');
 const session = require('./session');
 
 const Course = new Schema({
@@ -10,9 +10,8 @@ const Course = new Schema({
     },
     description: {
         type: String,
-        required: true,
     },
-    price: {
+    hourly_based_price: {
         type: Number,
         required: true,
     },
@@ -22,6 +21,11 @@ const Course = new Schema({
         enum : Object.values(courseType),
     },
     level : {
+        type : String,
+        required: true,
+        enum : Object.values(level)
+    },
+    image:{
         type : String,
     },
     sessions : [{

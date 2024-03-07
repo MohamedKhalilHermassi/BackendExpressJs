@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const Classroom = new Schema({
     location:{
         type: String,
+        required: true
     },
     sessions : [{
         type: Schema.Types.ObjectId,
