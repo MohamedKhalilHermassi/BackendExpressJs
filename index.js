@@ -13,6 +13,7 @@ const classroomRouter = require('./routes/classroomRoute');
 const examRouter = require('./routes/examRoute');
 const sessionRouter = require('./routes/sessionRoute');
 
+app.use('/images', express.static('uploads/coursesImages'));
 app.use(express.json());
 app.use(cors({
   credentials:true,

@@ -10,14 +10,16 @@ router.get('/', async(req, res, next) => {
 
 router.get('/:id', async(req, res, next) => {
     const course = await Course.findById(req.params.id);
+    console.log(course);
     res.json(course);
 })
 
-router.put('/:id',async(req, res, next) =>{
+router.put('/:id',upload.single('file'),async(req, res, next) =>{
     await Course.findByIdAndUpdate(req.params.id,{
         name: req.body.name,
         description: req.body.description,
-        hourly_based_price: req.body.price,
+        hourly_based_price: req.body.hourly_based_price,
+        image:req.file.filename,
         courseType: req.body.courseType,
         level: req.body.level
     })
@@ -30,11 +32,11 @@ router.delete('/:id', async(req, res, next) => {
 })
 
 router.post('/add',upload.single('file'), async(req, res, next) => {
-    console.log(req.file);
     const course = new Course({
         name: req.body.name,
         description: req.body.description,
-        hourly_based_price: req.body.price,
+        hourly_based_price: req.body.hourly_based_price        ,
+        image:req.file.filename,
         courseType: req.body.courseType,
         level: req.body.level
     });
