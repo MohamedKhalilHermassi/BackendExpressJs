@@ -43,10 +43,10 @@ const userSchema = new mongoose.Schema({
   products: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
   orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }],
   sessions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Session' }],
-
+  courses: [{type: mongoose.Schema.Types.ObjectId, ref: 'Course'}],
   verificationCode: {
     type: String,
   },
-})
+});
 
 module.exports = mongoose.model('User', userSchema);

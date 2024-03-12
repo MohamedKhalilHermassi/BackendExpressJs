@@ -59,6 +59,16 @@ router.get('/AllUsers',authenticateToken,authorizeUser('admin'), async (req, res
   }
 })
 
+//getTeachers
+router.get('/teachers',async (req, res, next) => {
+  try {
+    const users = await User.find({role:'teacher'})
+    res.json(users)
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+});
+
 // Getting One
 router.get('/OneUser/:email',authenticateToken, getuser, (req, res) => {
   res.json(res.user)
@@ -361,5 +371,7 @@ router.get('/user/:userId', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+
 
 module.exports = router
