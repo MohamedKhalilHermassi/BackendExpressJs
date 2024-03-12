@@ -17,7 +17,11 @@ const Session = new Schema({
     session : {
         type: Schema.Types.ObjectId,
         ref : 'Classroom'
-    }
+    } ,
+    users: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }]
 });
 
 module.exports = mongoose.model('Session', Session);

@@ -1,7 +1,7 @@
 {
     "mongo":{
 
-        "uri": "mongodb://127.0.0.1/elkindy"
+        "uri": "mongodb://127.0.0.1/elkindy2"
     },
     "token":{
         "secret":"Elkindy-secret-key"

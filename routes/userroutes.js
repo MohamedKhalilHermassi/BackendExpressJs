@@ -161,5 +161,14 @@ async function getuser(req, res, next) {
   res.user = user
   next()
 }
+// Getting One User by ID
+router.get('/user', authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 module.exports = router
