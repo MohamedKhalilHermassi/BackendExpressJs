@@ -45,7 +45,6 @@ router.post('/add-product', upload.single('image'),authenticateToken , async (re
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Add the newly created product's ObjectId to the user's products array
     user.products.push(newProduct._id);
 
     // Save the updated user document
