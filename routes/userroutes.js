@@ -41,7 +41,7 @@ router.post('/login', async (req, res) => {
       else if (user.verificationCode!=null) {
         return res.status(401).json({ message: 'Please verify your account' });
       } else {
-        const token = jwt.sign({ email: user.email, role: user.role, id:user.id }, config.token.secret, { expiresIn: '30s' });
+        const token = jwt.sign({ email: user.email, role: user.role, id:user.id }, config.token.secret, { expiresIn: '1h' });
         res.json({ token });
       }
     } catch (err) {
@@ -91,7 +91,30 @@ router.post('/register', upload.single('image'), async (req, res) => {
       });
 
       
-     
+      await transporter.sendMail({
+          from: config.email.email,
+          to: req.body.email,
+          subject: 'Email Verification',
+          text: `Hello ${user.fullname}, your account is being set up. To complete your registration, please verify your account. Your verification code is: ${verificationCode}`
+        });
+
+         // Send SMS verification (optional)
+   // if (user.phone) { // Send only if phone number is provided
+   //   try {
+      //  const client = new twilio(config.twilio.id, config.twilio.token);
+    //    const message = `Hello ${user.fullname}, your account is being set up. To complete your registration, please verify your account. Your verification code is: ${verificationCode}`;
+
+      //  await client.messages.create({
+       //   body: message,
+       //   to: `+216${user.phone}`, // Add country code to phone number
+       //   from: config.twilio.num,
+       // });
+
+     //   console.log('SMS verification sent successfully');
+     // } catch (error) {
+     //   console.error('Error sending SMS verification:', error);
+    //  }
+   // }
       
       const newUser = await user.save();
       
@@ -138,21 +161,21 @@ router.post('/forgetpassword', async (req, res) => {
 
        // Send SMS verification (optional)
  // if (user.phone) { // Send only if phone number is provided
- //   try {
-   //   const client = new twilio(config.twilio.id, config.twilio.token);
-   //   const message = `Hello ${user.fullname}, Your verification code is: ${verificationCode}`;
+   // try {
+     // const client = new twilio(config.twilio.id, config.twilio.token);
+      //const message = `Hello ${user.fullname}, Your verification code is: ${verificationCode}`;
 
-    //  await client.messages.create({
-    //    body: message,
-    //    to: `+216${user.phone}`, 
-    //    from: config.twilio.num,
-    //  });
+      //await client.messages.create({
+       // body: message,
+        //to: `+216${user.phone}`, 
+        //from: config.twilio.num,
+      //});
 
-   //   console.log('SMS verification sent successfully');
-   // } catch (error) {
-  //    console.error('Error sending SMS verification:', error);
-  //  }
- // }
+      //console.log('SMS verification sent successfully');
+    //} catch (error) {
+     //console.error('Error sending SMS verification:', error);
+    //}
+  //}
       
       await user.save();
       res.status(200).json({ message: 'successfully' });
@@ -239,6 +262,21 @@ router.put('/BanUser/:email',authenticateToken ,authorizeUser('admin'),getuser, 
   try {
     res.user.status=!res.user.status
     const updatedUser = await res.user.save()
+    if(res.user.status==true){
+      await transporter.sendMail({
+        from: config.email.email,
+        to: res.user.email,
+        subject: 'Revoking your ban',
+        text: `Your account has been reactivated. You can now access your account again.`
+      });
+    }else{
+      await transporter.sendMail({
+        from: config.email.email,
+        to: res.user.email,
+        subject: 'Your account has been banned',
+        text: `Your account has been banned for violating the terms of service.`
+      });
+    }
     res.json(updatedUser)
   } catch (err) {
     res.status(400).json({ message: err.message })
