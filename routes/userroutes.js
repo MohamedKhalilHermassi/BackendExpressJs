@@ -93,7 +93,7 @@ router.post('/register', upload.single('image'), async (req, res) => {
           email: req.body.email,
           password: hashedPassword,
           role: "Student",
-          adress: req.body.adress,
+          address: req.body.adress,
           phone: req.body.phone,
           birthday: req.body.birthday,
           image: req.file ? req.file.path : null,
@@ -229,7 +229,7 @@ router.patch('/UpdatingUser/:email',authenticateToken,upload.single('image'), ge
     res.user.role = req.body.role
   }
   if (req.body.adress != null) {
-    res.user.adress = req.body.adress
+    res.user.address = req.body.adress
   }
   if (req.body.phone != null) {
     res.user.phone = req.body.phone
