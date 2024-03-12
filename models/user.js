@@ -42,7 +42,11 @@ const userSchema = new mongoose.Schema({
   // relation one to many with products
   products: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
   orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }],
-  sessions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Session' }]
-});
+  sessions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Session' }],
+
+  verificationCode: {
+    type: String,
+  },
+})
 
 module.exports = mongoose.model('User', userSchema);
