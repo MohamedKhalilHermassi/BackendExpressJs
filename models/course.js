@@ -28,6 +28,14 @@ const Course = new Schema({
     image:{
         type : String,
     },
+    students:[{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    teacher:{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
     sessions : [{
         type: Schema.Types.ObjectId,
         ref: 'Session'
