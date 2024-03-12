@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-router.post('/add-product', upload.single('image'),authenticateToken ,authorizeUser('admin'), async (req, res) => {
+router.post('/add-product', upload.single('image'),authenticateToken , async (req, res) => {
   try {
     // Parse the JSON data from the form field
     const productData = JSON.parse(req.body.product);
@@ -126,5 +126,20 @@ router.put('/archiveProducts/:productId',authenticateToken ,authorizeUser('admin
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+// GET MY PRODUCTS
+router.get('/user/:userId/products', authenticateToken,async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    const products = await product.find({ user: userId });
+    res.json(products);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
 
 module.exports = router;
