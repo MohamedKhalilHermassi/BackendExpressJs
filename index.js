@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const config = require('./database/dbConfig.json');
 const cors = require('cors');
 const path = require('path');
-
+const socketIo = require('socket.io');
 const { createAdminUserIfNotExists } = require('./routes/DataInitializer');
 
 const app = express();
@@ -56,11 +56,17 @@ app.get('/', (req, res) => {
   res.send('Hello, Express!');
 });
 
-
+const reclamationrouter = require('./routes/reclamationRoutes')
+app.use('/Reclamtions', reclamationrouter)
 mongoose.connect(config.mongo.uri,
   console.info('Database connected successfully')
   );
-
+  const io = socketIo(app);
+  // Middleware pour utiliser Socket.io avec Express
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
