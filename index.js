@@ -6,6 +6,7 @@ const config = require('./database/dbConfig.json');
 const cors = require('cors');
 const path = require('path');
 const socketIo = require('socket.io');
+const http = require('http');
 const { createAdminUserIfNotExists } = require('./routes/DataInitializer');
 
 const app = express();
@@ -61,7 +62,8 @@ app.use('/Reclamtions', reclamationrouter)
 mongoose.connect(config.mongo.uri,
   console.info('Database connected successfully')
   );
-  const io = socketIo(app);
+  const server = http.createServer(app);
+  const io = socketIo(server);
   // Middleware pour utiliser Socket.io avec Express
 app.use((req, res, next) => {
   req.io = io;

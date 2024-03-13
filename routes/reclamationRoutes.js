@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Reclamation = require('../models/Reclamation');
 const User = require('../models/user');
+const config = require('../database/dbConfig.json');
 const { authenticateToken, authorizeUser } = require('./authMiddleware');
 const nodemailer = require('nodemailer');
 let transporter = nodemailer.createTransport({
