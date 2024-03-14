@@ -9,6 +9,8 @@ router.get('/', async(res, req, next) =>{
 
 router.post('/add', async(res, req, next) => {
     const classroom = new Classroom({
+        name:req.body.name,
+        etage:req.body.etage,
         location: req.body.location
     })
 
