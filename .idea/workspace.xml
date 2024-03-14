@@ -4,13 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="33d0293b-dd47-4d5a-be09-0ef153d3d2e4" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/Classroom.js" beforeDir="false" afterPath="$PROJECT_DIR$/models/Classroom.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/classroomRoute.js" beforeDir="false" afterPath="$PROJECT_DIR$/routes/classroomRoute.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/courseRoute.js" beforeDir="false" afterPath="$PROJECT_DIR$/routes/courseRoute.js" afterDir="false" />
-    </list>
+    <list default="true" id="33d0293b-dd47-4d5a-be09-0ef153d3d2e4" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -19,7 +13,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="classroom" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -33,7 +27,7 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "classroom",
+    "git-widget-placeholder": "main",
     "last_opened_file_path": "D:/4TWIN/semestre2/pi/project/FrontEndReactJs",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
