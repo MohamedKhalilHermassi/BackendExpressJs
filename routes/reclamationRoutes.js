@@ -24,11 +24,11 @@ router.post('/addreclamation', authenticateToken,async (req, res) => {
         return res.status(400).json({ message: 'Please enter your message' })
       }
       const reclamation = new Reclamation({
-        user: email,
+        user: user._id,
         message: message
     });
     const newrecla = await reclamation.save();
-    req.io.emit('reclamationAdded', { message: 'A new claim has been added' });
+   // req.io.emit('reclamationAdded', { message: 'A new claim has been added' });
       res.status(201).json(newrecla);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -43,7 +43,8 @@ router.get('/Allreclamtions/:email', authenticateToken, async (req, res) => {
       if (user == null) {
         return res.status(404).json({ message: 'Cannot find user' });
       } 
-      const reclamations = await Reclamation.find({ user: email });
+      let id =user._id;
+      const reclamations = await Reclamation.find({  user:id });
       res.status(200).json(reclamations);
     } catch (er) {
       res.status(500).json({ message: er.message });

@@ -228,8 +228,8 @@ router.patch('/UpdatingUser/:email',authenticateToken,upload.single('image'), ge
   if (req.body.role != null) {
     res.user.role = req.body.role
   }
-  if (req.body.adress != null) {
-    res.user.address = req.body.adress
+  if (req.body.address != null) {
+    res.user.address = req.body.address
   }
   if (req.body.phone != null) {
     res.user.phone = req.body.phone
@@ -305,7 +305,7 @@ router.post('/addingtetcher', authenticateToken ,authorizeUser('admin'),upload.s
           email: req.body.email,
           password: hashedPassword,
           role: "teacher",
-          adress: req.body.adress,
+          address: req.body.address,
           phone: req.body.phone,
           birthday: req.body.birthday,
           image: req.file ? req.file.path : null
