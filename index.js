@@ -41,7 +41,8 @@ const courseRouter = require('./routes/courseRoute');
 const classroomRouter = require('./routes/classroomRoute');
 const examRouter = require('./routes/examRoute');
 const sessionRouter = require('./routes/sessionRoute');
-const usersRouter = require('./routes/userroutes')
+const usersRouter = require('./routes/userroutes');
+const locationRouter = require('./routes/locationRouter');
 
 app.use('/users', usersRouter)
 const productRouter = require('./routes/productRoute')
@@ -58,6 +59,7 @@ app.use('/courses', courseRouter);
 app.use('/classrooms', classroomRouter);
 app.use('/exams', examRouter);
 app.use('/sessions', sessionRouter);
+app.use('/locations', locationRouter);
 
 //gestion magasin
 app.use('/market',productRouter)

@@ -56,6 +56,17 @@ router.get('/findbyname/:name', async(req, res, next) => {
     res.json(course[0]);
 })
 
+router.get('/coursesByStudent/:id', async(req, res, next) => {
+    const courses = await Course.find().populate('teacher');
+    const selectedCourses = courses.filter((c) => c.students.includes(req.params.id));
+    res.json(selectedCourses)
+})
+
+router.get('/coursesByTeacher/:id', async(req, res, next) => {
+    const courses = await Course.find({teacher: req.params.id}).populate('students');
+    res.json(courses)
+})
+
 router.put('/enroll/:courseid/:studentid', async (req, res, next) => {
     const course = await Course.findById(req.params.courseid);
     if (!course.students) {
