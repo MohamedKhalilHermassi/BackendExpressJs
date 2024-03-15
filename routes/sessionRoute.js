@@ -67,7 +67,40 @@ router.put('/:id', async (req, res, next) => {
     next(error);  
   }
 });
- 
+ //affect USER to Session
+ router.put('/join/:sessionid/:studentid', async (req, res, next) => {
+  try {
+    const session = await Session.findById(req.params.sessionid);
+    const student = await user.findById(req.params.studentid);
+
+    if (!session || !student) {
+      return res.status(404).json({ message: "Session or student not found" });
+    }
+
+    // Associate student with session
+    session.users.push(req.params.studentid);
+    await session.save();
+
+    // Associate session with student
+    student.sessions.push(req.params.sessionid);
+    await student.save();
+
+    res.json({ message: "Student enrolled into the session successfully" });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+// Add a new route to fetch session data by course ID
+router.get('/bycourse/:courseid', async (req, res, next) => {
+  try {
+    const sessions = await Session.find({ course: req.params.courseid });
+    res.json(sessions);
+  } catch (error) {
+    console.error('Error fetching sessions by course:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 
 module.exports = router;
