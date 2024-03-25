@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const {Status} = require('../shared/enums');
+const {Category} = require('../shared/enums');
 
 const Event = new Schema({
     title:{
@@ -31,6 +32,15 @@ const Event = new Schema({
         type : Number,
         required: true,
     },
+    ticketPrice: {
+        type: Number,
+        required: true,
+    },
+    category: {
+        type: String,
+        required: true,
+        enum: Object.values(Category)
+    },
     status :{
         type: String,
         required: true,
@@ -40,6 +50,10 @@ const Event = new Schema({
         type: String,
         required: false,
     },
+    users: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }]
 });
 
 module.exports = mongoose.model('Event', Event);

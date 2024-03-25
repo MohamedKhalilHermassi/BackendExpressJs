@@ -5,9 +5,17 @@ const Status = {
     canceled : 'Canceled',
 };
 
+const Category = {
+    concert : 'Concert',
+    audition : 'Audition',
+    charity : 'Charity',
+};
+
 Object.freeze(Status);
+Object.freeze(Category);
 
 
 module.exports ={
     Status,
+    Category
 };

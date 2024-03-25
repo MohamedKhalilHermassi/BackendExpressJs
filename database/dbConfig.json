@@ -3,6 +3,9 @@
 
         "uri": "mongodb://127.0.0.1/elkindy"
     },
+    "token":{
+        "secret":"Elkindy-secret-key"
+    },
     "cors":{
         "options":"http://localhost:5173"
 
