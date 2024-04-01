@@ -374,4 +374,24 @@ router.get('/user/:userId', async (req, res) => {
 
 
 
+
+router.get('/user/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const userWithEvents = await User.findById(userId).populate('events');
+
+    if (!userWithEvents) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json(userWithEvents);
+  } catch (error) {
+    console.error('Error fetching user with events:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+
 module.exports = router

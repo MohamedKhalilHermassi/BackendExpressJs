@@ -1,4 +1,5 @@
 const express = require('express');
+const multer = require('multer');
 const logger = require('morgan');
 const createEroor = require('http-errors');
 const mongoose = require('mongoose');
@@ -9,8 +10,23 @@ const http = require('http');
 const { createAdminUserIfNotExists } = require('./routes/DataInitializer');
 
 const app = express();
+
 app.use(cors(config.cors.options));
 
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function(req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname)); 
+  }
+});
+
+const upload = multer({ storage: storage });
+
+app.post('/upload', upload.single('image'), (req, res) => {
+  res.json({ imageUrl: '/uploads/' + req.file.filename });
+});
 
 
 
@@ -43,6 +59,7 @@ const examRouter = require('./routes/examRoute');
 const sessionRouter = require('./routes/sessionRoute');
 const usersRouter = require('./routes/userroutes');
 const locationRouter = require('./routes/locationRouter');
+const eventRouter = require('./routes/eventRoute');
 
 app.use('/users', usersRouter)
 const productRouter = require('./routes/productRoute')
@@ -65,6 +82,15 @@ app.use('/locations', locationRouter);
 app.use('/market',productRouter)
 app.use('/uploads', express.static('uploads'));
 app.use('/orders', orderRouter);
+
+
+app.use((req, res, next) => {
+  console.log(`${req.method} request for '${req.url}'`);
+  next();
+});
+
+//gestion evenements
+app.use('/events', eventRouter);
 app.get('/', (req, res) => {
   res.send('Hello, Express!');
 });
