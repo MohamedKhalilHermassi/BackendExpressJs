@@ -1,12 +1,13 @@
 const mongoose = require('mongoose');
+const { classroomStatus, courseType } = require('../shared/enums');
 const Schema = mongoose.Schema;
 
 const Classroom = new Schema({
-    name:{
-        type:String,
+    number:{
+        type:Number,
         required:true
     },
-    etage:{
+    floor:{
         type:Number,
         required: true
     },
@@ -16,6 +17,13 @@ const Classroom = new Schema({
     },
     status:{
         type:String,
+        required: true,
+        enum: Object.values(classroomStatus),
+    },
+    type:{
+        type: String,
+        required: true,
+        enum: Object.values(courseType)
     },
     sessions : [{
         type: Schema.Types.ObjectId,

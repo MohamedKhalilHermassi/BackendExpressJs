@@ -3,6 +3,7 @@ const courseType = {
     instrument : 'Instrument',
 };
 
+Object.freeze(courseType);
 
 const productCondition = {
     new:'New',
@@ -18,7 +19,8 @@ const productType = {
 
 }
 
-Object.freeze(courseType);
+Object.freeze(productType);
+
 
 const level = {
     niveau1 : 'Level 1',
@@ -31,12 +33,19 @@ const level = {
 };
 Object.freeze(level);
 
-Object.freeze(productType);
+const classroomStatus = {
+    available:'available',
+    maintenance:'maintenance',
+
+}
+
+Object.freeze(classroomStatus);
 
 
 module.exports ={
     courseType,
     level,
     productCondition,
-    productType
+    productType,
+    classroomStatus
 };

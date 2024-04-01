@@ -21,4 +21,9 @@ router.post('/', async (req, res, next) => {
     res.json({message : "Location added successfully"})
 })
 
+router.get('/:id', async (req, res) => {
+    const location = await Location.findById(req.params.id);
+    res.json(location);
+})
+
 module.exports = router;
