@@ -164,7 +164,6 @@ async function getuser(req, res, next) {
 }
 
 
-
 router.get('/user/:userId', async (req, res) => {
   try {
     const userId = req.params.userId;
@@ -181,5 +180,7 @@ router.get('/user/:userId', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+
 
 module.exports = router
