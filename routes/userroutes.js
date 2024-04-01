@@ -93,7 +93,7 @@ router.post('/register', upload.single('image'), async (req, res) => {
           email: req.body.email,
           password: hashedPassword,
           role: "Student",
-          address: req.body.adress,
+          address: req.body.address,
           phone: req.body.phone,
           birthday: req.body.birthday,
           image: req.file ? req.file.path : null,
