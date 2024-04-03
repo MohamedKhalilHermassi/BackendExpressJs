@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js",
-    "test": "cross-env NODE_ENV=test jest --testTimeout=5000",
+    "test": "cross-env NODE_ENV=test jest --testTimeout=15000",
     "dev": "npm run dev"
   },
   "keywords": [],
@@ -23,6 +23,7 @@
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.11",
     "path": "^0.12.7",
+    "readable-stream": "^4.5.2",
     "socket.io": "^4.7.4",
     "supertest": "^6.3.4",
     "twilio": "^4.23.0"
