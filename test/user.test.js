@@ -11,42 +11,37 @@ beforeEach(async () => {
   /* Closing database connection after each test. */
   afterEach(async () => {
     await mongoose.connection.close();
-    server.close();
+    server.closeAllConnections();
   });
 
 
-  let reclamtionId = " "
-  describe("POST /Reclamtions/addreclamationtest", () => {
+  let userId = " "
+  describe("POST /users/creattest", () => {
     test("should responds with json", async () => {
         return request(app)
-            .post("/Reclamtions/addreclamationtest")
-            .send({ message: 'Votre message de réclamation', typereclamtion: 'administrative' })
+            .post("/users/creattest")
+            .send({ email: 'fakeemail@gmail.com', fullname: 'fakeuser', password: '123' })
             .expect(201)
             .then(async ({ body }) => {
-                reclamtionId = body._id;
-                console.log("Réclamation ID:", reclamtionId);
+                userId = body.email;
+                console.log("user email:", userId);
                 await server.close();
             });
     });
 });
 
 
-describe("DELETE /Reclamtions/DeleteOneReclamationtest/:id", () => {
+
+describe("DELETE /users/Deletefake/:email", () => {
     test("should responds with json", async () => {
         return request(app)
-            .delete(`/Reclamtions/DeleteOneReclamationtest/${reclamtionId}`)
+            .delete(`/users/Deletefake/${userId}`)
             .expect(200)
             .expect('Content-Type', /json/)
-            .expect({ message: 'Deleted Reclamation' })
+            .expect({ message: 'Deleted User' })
             .then(async () => {
-                console.log("Réclamation supprimée avec succès");
-                await server.close();
+                console.log("User supprimée avec succès");
+               await server.close();
             });
     });
 });
-
-
-  
-
- 
-  

@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const request = require("supertest");
 const {app,server} = require("../index");
 const config = require('../database/dbConfig.json');
-
+server.close();
 beforeEach(async () => {
     await mongoose.connect(config.mongo.uri)
 
@@ -19,7 +19,7 @@ beforeEach(async () => {
       const res = await request(app).get("/market/get-products");
       expect(res.statusCode).toBe(200);
       expect(res.body.length).toBeGreaterThan(0);
-      server.close();
+      await server.close();
     });
 
     
