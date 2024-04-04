@@ -43,6 +43,7 @@ const examRouter = require('./routes/examRoute');
 const sessionRouter = require('./routes/sessionRoute');
 const usersRouter = require('./routes/userroutes');
 const locationRouter = require('./routes/locationRouter');
+const bookRouter = require('./routes/bookRoute')
 
 app.use('/users', usersRouter)
 const productRouter = require('./routes/productRoute')
@@ -65,6 +66,7 @@ app.use('/locations', locationRouter);
 app.use('/market',productRouter)
 app.use('/uploads', express.static('uploads'));
 app.use('/orders', orderRouter);
+app.use('/book',bookRouter);
 app.get('/', (req, res) => {
   res.send('Hello, Express!');
 });

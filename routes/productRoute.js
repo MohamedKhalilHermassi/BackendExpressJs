@@ -32,6 +32,7 @@ router.post('/add-product', upload.single('image'),authenticateToken , async (re
       productAvailability: false,
       filename: req.file.filename,
       archived: false,
+      sold : false,
       user: productData.user, // Assign the user's ID to the product's user field
     });
 
@@ -105,26 +106,25 @@ router.put('/archiveProducts/:productId',authenticateToken ,authorizeUser('admin
     const { productId } = req.params;
     const { archived } = req.body;
 
-    // Validate if productId is provided and archived is a boolean value
     if (!productId || typeof archived !== 'boolean') {
       return res.status(400).json({ error: 'Invalid request body' });
     }
 
-    // Find the product by ID and update its archived status
     const updatedProduct = await product.findByIdAndUpdate(productId, { archived }, { new: true });
 
-    // If product is not found, return 404 error
     if (!updatedProduct) {
       return res.status(404).json({ error: 'Product not found' });
     }
 
-    // Return the updated product
     res.json(updatedProduct);
   } catch (error) {
     console.error('Error updating product archived status:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+
+
 
 // GET MY PRODUCTS
 router.get('/user/:userId/products', authenticateToken,async (req, res) => {
@@ -139,6 +139,30 @@ router.get('/user/:userId/products', authenticateToken,async (req, res) => {
   }
 });
 
+router.put('/soldproduct/:productId',authenticateToken , async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const { sold } = req.body;
 
+    // Validate if productId is provided and productAvailability is a boolean value
+    if (!productId || typeof sold !== 'boolean') {
+      return res.status(400).json({ error: 'Invalid request body' });
+    }
+
+    // Find the product by ID and update its availability
+    const updatedproduct = await product.findByIdAndUpdate(productId, { sold }, { new: true });
+
+    // If product is not found, return 404 error
+    if (!updatedproduct) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    // Return the updated product
+    res.json(updatedproduct);
+  } catch (error) {
+    console.error('Error updating the sold product:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 module.exports = router;
