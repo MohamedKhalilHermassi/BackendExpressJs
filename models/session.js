@@ -14,7 +14,7 @@ const Session = new Schema({
         type: Schema.Types.ObjectId,
         ref : 'Course'
     },
-    session : {
+    classroom : {
         type: Schema.Types.ObjectId,
         ref : 'Classroom'
     } ,

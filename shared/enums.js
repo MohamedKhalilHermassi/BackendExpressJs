@@ -32,11 +32,18 @@ const level = {
 Object.freeze(level);
 
 Object.freeze(productType);
+const classroomStatus = {
+    available:'available',
+    maintenance:'maintenance',
 
+}
+
+Object.freeze(classroomStatus);
 
 module.exports ={
     courseType,
     level,
     productCondition,
-    productType
+    productType,
+    classroomStatus
 };
