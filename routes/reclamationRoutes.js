@@ -5,6 +5,9 @@ const User = require('../models/user');
 const config = require('../database/dbConfig.json');
 const { authenticateToken, authorizeUser } = require('./authMiddleware');
 const nodemailer = require('nodemailer');
+const multer = require('multer');
+const path = require('path');
+
 let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -12,30 +15,51 @@ let transporter = nodemailer.createTransport({
         pass: config.email.pwd
     }
   });
-
+  const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/reclamtions') 
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+    }
+  });
+  
+  // Initialiser l'instance multer avec la configuration de stockage
+  const upload = multer({ storage: storage });
   module.exports = (io)=>{
     //ajouter une réclamation
-router.post('/addreclamation', authenticateToken,async (req, res) => {
-  try {
-    const { email, message } = req.body;
-   let user = await User.findOne({ email });
-    if (user == null) {
-      return res.status(404).json({ message: 'Cannot find user' });
-    } 
-    if(message==null){
-      return res.status(400).json({ message: 'Please enter your message' })
-    }
-    const reclamation = new Reclamation({
-      user: user._id,
-      message: message
-  });
-  const newrecla = await reclamation.save();
-  io.emit('Reclamation',`${user.fullname} have added a new claim : ${newrecla.message}` );
-    res.status(201).json(newrecla);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+    router.post('/addreclamation', authenticateToken, upload.array('images'), async (req, res) => {
+      try {
+        const { email, message, typereclamtion, otherreclamtion } = req.body;
+        let user = await User.findOne({ email });
+        if (!user) {
+          return res.status(404).json({ message: 'Cannot find user' });
+        } 
+        if (!message) {
+          return res.status(400).json({ message: 'Please enter your message' });
+        }
+    
+        let files = null;
+        if (req.files && req.files.length > 0) {
+          files = req.files.map(file => file.path);
+        }
+    
+        const reclamation = new Reclamation({
+          user: user._id,
+          message: message,
+          typereclamtion: typereclamtion,
+          otherreclamtion: typereclamtion === 'other' ? otherreclamtion : null,
+          files: files,
+        });
+    
+        const newReclamation = await reclamation.save();
+        io.emit('Reclamation', `${user.fullname} has added a new claim: ${newReclamation.message}`);
+        res.status(201).json(newReclamation);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+    
 
 // Getting all reclamtions for one user  
 router.get('/Allreclamtions/:email', authenticateToken, async (req, res) => {
@@ -79,23 +103,30 @@ router.delete('/DeleteOneReclamation/:id',authenticateToken , async (req, res) =
 })
 
 // update One
-router.post('/updateReclamation',authenticateToken , async (req, res) => {
+router.post('/updateReclamation', authenticateToken, upload.array('images'), async (req, res) => {
   try {
-      const _id = req.body.id;
-      const message = req.body.message;
-      let reclamation = await Reclamation.findById({ _id });
-      if (reclamation == null) {
-          return res.status(404).json({ message: 'Cannot find Reclamation' });
-        } 
-        reclamation.message=message;
-        await reclamation.save();
-        let user=  await User.findById(reclamation.user);
-       io.emit('Reclamation',`${user.fullname} have edited the claim : ${reclamation.message}`);
-        res.status(200).json({ message: 'Reclamation updated successfully' });
+    const { id, message, typereclamtion, otherreclamtion } = req.body;
+    let reclamation = await Reclamation.findById(id);
+    
+    if (!reclamation) {
+      return res.status(404).json({ message: 'Cannot find Reclamation' });
+    } 
+    if (message) reclamation.message = message;
+    if (typereclamtion) reclamation.typereclamtion = typereclamtion;
+    if (otherreclamtion && typereclamtion === 'other') reclamation.otherreclamtion = otherreclamtion;
+    else  reclamation.otherreclamtion =null;
+
+    await reclamation.save();
+
+    let user = await User.findById(reclamation.user);
+    io.emit('Reclamation', `${user.fullname} has edited the claim: ${reclamation.message}`);
+    
+    res.status(200).json({ message: 'Reclamation updated successfully' });
   } catch (err) {
     res.status(500).json({ message: err.message })
   }
-})
+});
+
 
  // resolving reclamation
 router.post('/resolving/:id',authenticateToken , async (req, res) => {
@@ -127,6 +158,35 @@ router.post('/resolving/:id',authenticateToken , async (req, res) => {
         });
         await reclamation.save();
         res.status(200).json({ message: 'Reclamation updated successfully' });
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+router.post('/addreclamationtest', async (req, res) => {
+  try {
+    const { message, typereclamtion } = req.body;
+    if (!message) {
+      return res.status(400).json({ message: 'Please enter your message' });
+    }
+    const reclamation = new Reclamation({
+      message: message,
+      typereclamtion: typereclamtion,
+    });
+    const newReclamation = await reclamation.save();
+    res.status(201).json(newReclamation);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+router.delete('/DeleteOneReclamationtest/:id' , async (req, res) => {
+  try {
+      const _id = req.params.id;
+      let reclamation = await Reclamation.findById({ _id });
+      if (reclamation == null) {
+          return res.status(404).json({ message: 'Cannot find Reclamation' });
+        } 
+    await reclamation.deleteOne();
+    res.json({ message: 'Deleted Reclamation' })
   } catch (err) {
     res.status(500).json({ message: err.message })
   }

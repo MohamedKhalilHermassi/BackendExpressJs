@@ -391,7 +391,40 @@ router.get('/user/:userId', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
+router.post('/creattest', async (req, res) => {
+  try {
+      const existingUser = await User.findOne({ email: req.body.email });
+      if (existingUser) {
+          return res.status(302).json({ message: 'Email already exists' });
+      }
+    if(req.body.password==null &&req.body.fullname==null){
+    return res.status(400).json({ message: 'Bad request' });
+    }
+      const user = new User({
+          fullname: req.body.fullname,
+          email: req.body.email,
+          password: req.body.password,
+          role: "Student",
+          address: 'ff',
+          phone: 456,
+          birthday: '1999-01-01T00:00:00.000+00:00',
+          image:"gg"
+          
+      }); 
+      const newUser = await user.save();
+      res.status(201).json(newUser);
+  } catch (err) {
+      res.status(400).json({ message: err.message });
+  }
+});
+router.delete('/Deletefake/:email',getuser, async (req, res) => {
+  try {
+    await res.user.deleteOne()
+    res.json({ message: 'Deleted User' })
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
 
 
 module.exports = router
