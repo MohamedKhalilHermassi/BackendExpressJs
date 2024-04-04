@@ -6,6 +6,8 @@ const config = require('../database/dbConfig.json');
 const { authenticateToken, authorizeUser } = require('./authMiddleware');
 const nodemailer = require('nodemailer');
 const multer = require('multer');
+const path = require('path');
+
 let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -103,7 +105,7 @@ router.delete('/DeleteOneReclamation/:id',authenticateToken , async (req, res) =
 // update One
 router.post('/updateReclamation', authenticateToken, upload.array('images'), async (req, res) => {
   try {
-    const { id, message, typereclamtion, otherreclamtion, status } = req.body;
+    const { id, message, typereclamtion, otherreclamtion } = req.body;
     let reclamation = await Reclamation.findById(id);
     
     if (!reclamation) {
@@ -112,20 +114,7 @@ router.post('/updateReclamation', authenticateToken, upload.array('images'), asy
     if (message) reclamation.message = message;
     if (typereclamtion) reclamation.typereclamtion = typereclamtion;
     if (otherreclamtion && typereclamtion === 'other') reclamation.otherreclamtion = otherreclamtion;
-    if (status) reclamation.status = status;
-    if (req.body.deleteImages && req.body.deleteImages.length > 0) {
-      req.body.deleteImages.forEach(imagePath => {
-        fs.unlinkSync(imagePath);
-        const index = reclamation.files.indexOf(imagePath);
-        if (index !== -1) {
-          reclamation.files.splice(index, 1);
-        }
-      });
-    }
-    if (req.files && req.files.length > 0) {
-      const newImagesPaths = req.files.map(file => file.path);
-      reclamation.files = reclamation.files.concat(newImagesPaths);
-    }
+    else  reclamation.otherreclamtion =null;
 
     await reclamation.save();
 
