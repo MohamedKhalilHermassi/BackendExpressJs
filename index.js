@@ -61,6 +61,7 @@ const sessionRouter = require('./routes/sessionRoute');
 const usersRouter = require('./routes/userroutes');
 const locationRouter = require('./routes/locationRouter');
 const eventRouter = require('./routes/eventRoute');
+const bookRouter = require('./routes/bookRoute')
 
 app.use('/users', usersRouter)
 const productRouter = require('./routes/productRoute')
@@ -92,6 +93,7 @@ app.use((req, res, next) => {
 
 //gestion evenements
 app.use('/events', eventRouter);
+app.use('/book',bookRouter);
 app.get('/', (req, res) => {
   res.send('Hello, Express!');
 });

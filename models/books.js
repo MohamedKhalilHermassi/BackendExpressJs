@@ -3,35 +3,26 @@ const { productCondition, productType } = require('../shared/enums');
 
 const Schema = mongoose.Schema;
 
-const Product = new Schema({
-  productName: {
+const Book = new Schema({
+  bookName: {
     type: String,
     required: true
   },
-  productDescription: {
+  bookDescription: {
     type: String,
     required: true
   },
-  productPrice: {
+  bookPrice: {
     type: Number,
     required: true
   },
-  productCondition: {
+ 
+  Author: {
     type: String,
     required: true,
-    enum: Object.values(productCondition),
   },
-  productAvailability: {
-    type: Boolean,
-    required: true,
-  },
-  productType: {
-    type: String,
-    required: true,
-    enum: Object.values(productType),
-  },
-  sold: {
-    type: Boolean,
+  level: {
+    type: Number,
     required: true,
   },
   filename: {
@@ -46,8 +37,7 @@ const Product = new Schema({
     type: Boolean,
     required: true,
   },
-  // Many to one with user
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+
 });
 
-module.exports = mongoose.model('Product', Product);
+module.exports = mongoose.model('Book', Book);
