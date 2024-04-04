@@ -20,7 +20,7 @@ beforeEach(async () => {
     test("should responds with json", async () => {
         return request(app)
             .post("/users/creattest")
-            .send({ email: 'fakeemail@gmail.com', fullname: 'fakeuser', password: '123' })
+            .send({ email: 'fakeemail@gmail.com', fullname: 'fakeuser', password: 'khalil123' })
             .expect(201)
             .then(async ({ body }) => {
                 userId = body.email;
