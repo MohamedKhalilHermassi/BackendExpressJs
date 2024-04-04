@@ -39,7 +39,19 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  
+  notes: [
+    {
+      courseName: {
+        type: String,
+        required: true
+      },
+      mark: {
+        type: Number,
+        required: true
+      }
+    }
+  ],
+
   products: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
   books: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }],
 

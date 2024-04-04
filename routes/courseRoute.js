@@ -82,7 +82,74 @@ router.put('/enroll/:courseid/:studentid', async (req, res, next) => {
     await student.save();
     res.json({message: "you have enrolled into this course"});
 
-})
+});
+
+// find my courses as a teacher
+
+router.get('/my-courses/:teacherid', async (req, res) => {
+    const teacherid = req.params.teacherid;
+
+    try {
+        const courses = await Course.find({ 'teacher':teacherid }).populate('students');
+        res.status(200).json(courses);
+    } catch (error) {
+        console.error('Error fetching courses:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+router.get('/students-of-course/:courseId', async (req, res) => {
+    const courseId = req.params.courseId;
+
+    try {
+        const course = await Course.findById(courseId).populate('students');
+        if (!course) {
+            return res.status(404).json({ message: 'Course not found' });
+        }
+        const students = course.students;
+        res.status(200).json(students);
+    } catch (error) {
+        console.error('Error fetching students of the course:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.put('/add-note/:userId', async (req, res) => {
+    const userId = req.params.userId;
+    const { courseName, mark } = req.body;
+  
+    try {
+      const userfound = await user.findById(userId);
+      if (!userfound) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      userfound.notes.push({ courseName, mark });
+      await userfound.save();
+  
+      res.status(200).json({ message: 'Note added successfully', userfound });
+    } catch (error) {
+      console.error('Error adding note:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+router.get('/notes/:userId', async (req, res) => {
+    const userId = req.params.userId;
+
+    try {
+        const userfound = await user.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.status(200).json({ notes: userfound.notes });
+    } catch (error) {
+        console.error('Error fetching user notes:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
 
 
 

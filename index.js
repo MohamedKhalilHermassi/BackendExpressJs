@@ -50,7 +50,7 @@ mongoose.connect(config.mongo.uri)
 const db = mongoose.connection
 db.on('error', (error) => console.error(error))
 db.once('open', () => {console.log('Connected to Database')
-//createAdminUserIfNotExists()
+createAdminUserIfNotExists()
 });
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.json())
