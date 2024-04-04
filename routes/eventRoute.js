@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Event  = require('../models/event');
 const User = require('../models/user');
+const mongoose = require('mongoose');
 
 router.get("/", async(req, res,next) => {
     const events = await Event.find();    
@@ -92,6 +93,28 @@ router.get('/user/:userId/events', async (req, res) => {
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  router.get('/event/:eventId/users', async (req, res) => {
+    const { eventId } = req.params;
+  
+    // Check if eventId is undefined or not a valid ObjectId
+    if (!eventId || !mongoose.Types.ObjectId.isValid(eventId)) {
+      return res.status(400).json({ message: 'Invalid or missing event ID' });
+    }
+  
+    try {
+      const event = await Event.findById(eventId).populate('users');
+  
+      if (!event) {
+        return res.status(404).json({ message: 'Event not found' });
+      }
+  
+      return res.status(200).json(event.users);
+    } catch (error) {
+      console.error('Error in /event/:eventId/users route:', error);
+      return res.status(500).json({ message: 'Server error' });
     }
   });
 
