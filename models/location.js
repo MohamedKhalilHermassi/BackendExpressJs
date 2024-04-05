@@ -14,6 +14,14 @@ const Location = new Schema({
         type: String,
         required: true
     },
+    lat: {
+        type: Number, 
+        required: true
+    },
+    lng: {
+        type: Number,
+        required: true
+    },
     numberOfFloors:{
         type: Number,
         required: true

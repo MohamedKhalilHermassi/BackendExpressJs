@@ -32,6 +32,13 @@ const level = {
 Object.freeze(level);
 
 Object.freeze(productType);
+const classroomStatus = {
+    available:'available',
+    maintenance:'maintenance',
+
+}
+
+Object.freeze(classroomStatus);
 
 const Status = {
     incoming : 'Incoming',
@@ -53,6 +60,7 @@ module.exports ={
     level,
     productCondition,
     productType,
+    classroomStatus,
     Status,
     Category
 };
