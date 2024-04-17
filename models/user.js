@@ -22,10 +22,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  phone: {
-    type: Number,
-    required: true
-  },
+    phone: {
+      type: Number,
+      required: true
+    },
   birthday: {
     type: Date,
     required: true,
@@ -38,6 +38,10 @@ const userSchema = new mongoose.Schema({
   image: {
     type: String,
     required: true,
+  },
+  level: {
+    type: Number,
+    required: true
   },
   notes: [
     {

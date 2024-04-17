@@ -93,6 +93,7 @@ router.post('/register', upload.single('image'), async (req, res) => {
           email: req.body.email,
           password: hashedPassword,
           role: "Student",
+          level : req.body.level,
           address: req.body.address,
           phone: req.body.phone,
           birthday: req.body.birthday,
@@ -307,6 +308,7 @@ router.post('/addingtetcher', authenticateToken ,authorizeUser('admin'),upload.s
           role: "teacher",
           address: req.body.address,
           phone: req.body.phone,
+          level:7,
           birthday: req.body.birthday,
           image: req.file ? req.file.path : null
          

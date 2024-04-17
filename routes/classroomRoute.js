@@ -3,7 +3,7 @@ const router = express.Router();
 const Classroom = require('../models/Classroom');
 
 router.get('/', async(req, res, next) =>{
-    const classromms = await Classroom.find();
+    const classromms = await Classroom.find().populate('location');
     res.json(classromms);
 })
 

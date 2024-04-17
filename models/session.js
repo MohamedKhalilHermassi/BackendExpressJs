@@ -14,11 +14,21 @@ const Session = new Schema({
         type: Schema.Types.ObjectId,
         ref : 'Course'
     },
-    session : {
+    
+    classroom : {
         type: Schema.Types.ObjectId,
-        ref : 'Classroom'
+        ref : 'Classroom',
+        required : true
     } ,
-    users: [{
+    teacher : {
+        type: Schema.Types.ObjectId,
+        ref : 'User'
+    },
+    level: {
+        type: Number,
+        required: true,
+    },
+    students: [{
         type: Schema.Types.ObjectId,
         ref: 'User'
     }]
