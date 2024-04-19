@@ -53,6 +53,7 @@ const userSchema = new mongoose.Schema({
   ],
 
   products: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+  recommendedProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
   books: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }],
 
   orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }],
