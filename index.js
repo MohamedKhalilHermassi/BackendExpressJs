@@ -42,6 +42,18 @@ const io = new Server(server, {
   },
 });
 
+io.on('connection', (socket) => {
+
+  socket.on('message', (message) => {
+    console.log('Message received:', message);
+    // Broadcast the message to all connected clients
+    io.emit('message', message);
+  });
+
+  socket.on('disconnect', () => {
+  });
+});
+
 
 
 
@@ -62,6 +74,9 @@ const usersRouter = require('./routes/userroutes');
 const locationRouter = require('./routes/locationRouter');
 const eventRouter = require('./routes/eventRoute');
 const bookRouter = require('./routes/bookRoute')
+const paymentRouter = require('./routes/payementRoute')
+const messageRouter = require('./routes/messageRoute')
+const transactionRouter = require('./routes/transactionRoute')
 
 app.use('/users', usersRouter)
 const productRouter = require('./routes/productRoute')
@@ -79,11 +94,13 @@ app.use('/classrooms', classroomRouter);
 app.use('/exams', examRouter);
 app.use('/sessions', sessionRouter);
 app.use('/locations', locationRouter);
-
 //gestion magasin
 app.use('/market',productRouter)
 app.use('/uploads', express.static('uploads'));
 app.use('/orders', orderRouter);
+app.use('/payement',paymentRouter);
+app.use('/api/messages', messageRouter); 
+app.use('/transaction', transactionRouter); 
 
 
 app.use((req, res, next) => {

@@ -41,7 +41,15 @@ router.post('/login', async (req, res) => {
       else if (user.verificationCode!=null) {
         return res.status(401).json({ message: 'Please verify your account' });
       } else {
-        const token = jwt.sign({ email: user.email, role: user.role, id:user.id }, config.token.secret, { expiresIn: '1h' });
+        if(user.expirePayementDate>new Date())
+        {
+          user.paid=true;
+        }
+        else
+        {
+          user.paid=false;
+        }
+        const token = jwt.sign({ email: user.email, role: user.role, id:user.id,paid: user.paid,expirePaid:user.expirePayementDate }, config.token.secret, { expiresIn: '1h' });
         res.json({ token });
       }
     } catch (err) {
@@ -94,6 +102,9 @@ router.post('/register', upload.single('image'), async (req, res) => {
           password: hashedPassword,
           role: "Student",
           level : req.body.level,
+          paid:false,
+          lastPaymentDate:null,
+          expirePayementDate:new Date(),
           address: req.body.address,
           phone: req.body.phone,
           birthday: req.body.birthday,

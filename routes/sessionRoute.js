@@ -2,16 +2,26 @@ const express = require('express');
 const router = express.Router();
 const Session = require('../models/session');
 const user = require('../models/user');
-const { authenticateToken, authorizeUser } = require('./authMiddleware');
+const config = require('../database/dbConfig.json');
 
+const { authenticateToken, authorizeUser } = require('./authMiddleware');
+const e = require('express');
+const nodemailer = require('nodemailer');
+let transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+      user: config.email.email,
+      pass: config.email.pwd
+  }
+});
 router.get('/', async(req, res, next) => {
-    const couSessionrses = await Session.find().populate({ 
-      path: 'classroom', 
-      populate: {
-        path: 'location'
-      }
-    }).populate('course');
-    res.json(couSessionrses);
+  const couSessionrses = await Session.find().populate({ 
+    path: 'classroom', 
+    populate: {
+      path: 'location'
+    }
+  }).populate('course');
+  res.json(couSessionrses);
 })
 //FIND BY ID
 router.get('/:id', async(req, res, next) => {
@@ -25,54 +35,32 @@ router.delete('/:id', async(req, res, next) => {
 })
 // ADD SESSION
 
-router.post('/add', async (req, res, next) => {
-  try {
-    console.log(req.body);
-
-    const startDate = new Date(req.body.startDate);
-    const endDate = new Date(startDate.getTime() + req.body.duree * 60000);
-    console.log("enddate : " ,endDate)
-    const sessions = await Session.find();
-    const existingSession = sessions.filter(session => {
-      const sessionStartDate = new Date(session.startDate);
-      return sessionStartDate >= startDate || sessionStartDate <= endDate;
-  });
-  
+router.post('/add',authenticateToken,authorizeUser("teacher"), async(req, res, next) => {
     
-
-    console.log(existingSession);
-
-    if (existingSession.length>0) {
-      return res
-        .status(400)
-        .json({ message: 'Session already exists in the classroom within the given time interval' });
-    }
-
-    const users = await user.find({ role: 'Student', level: req.body.level });
-
-    const session = new Session({
+  console.log(req.body);
+  const session = new Session({
       startDate: req.body.startDate,
       endDate: endDate,
       duree: req.body.duree,
-      course: req.body.course,
-      teacher: req.body.teacher,
-      classroom: req.body.classroom,
-      level: req.body.level,
-      students: users
+      course: req.body.courseId,
+      usersId: req.body.usersId
     });
-
-    await session.save();
-
-    const foundTeacher = await user.findById(req.body.teacher);
-    foundTeacher.sessions.push(session._id);
-    await foundTeacher.save();
-
-    res.json({ message: 'Session successfully added' });
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
+  
+    
+    try {
+      session.users.push(req.body.usersId);
+      console.log(req.body.usersId);
+      const newUser = await user.findById(req.body.usersId);
+      newUser.sessions.push(session._id);
+      await session.save();
+      await newUser.save();
+      res.json({ message: 'Session successfully added' });
+    } catch (error) {
+      console.error('Error:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+  
 //edit
 
 router.put('/:id', async (req, res, next) => {
@@ -104,7 +92,13 @@ router.put('/:id', async (req, res, next) => {
     if (!session || !student) {
       return res.status(404).json({ message: "Session or student not found" });
     }
+   if  (student.sessions.includes(req.params.sessionid))
+   {
+    res.json({ message: "Student already enrolled into the session" })   ;
+   }
+   else {
 
+  
     // Associate student with session
     session.users.push(req.params.studentid);
     await session.save();
@@ -112,8 +106,16 @@ router.put('/:id', async (req, res, next) => {
     // Associate session with student
     student.sessions.push(req.params.sessionid);
     await student.save();
+    await transporter.sendMail({
+      from: config.email.email,
+      to: student.email,
+      subject: 'Session Joined',
+      text: `Hello ${student.fullname}, You have joined the session of ${session.startDate}`
 
+  });
     res.json({ message: "Student enrolled into the session successfully" });
+  }
+  
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ message: "Internal server error" });
