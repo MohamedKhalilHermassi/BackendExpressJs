@@ -35,6 +35,21 @@ const userSchema = new mongoose.Schema({
     required: true,
     default: true
   },
+  //payement info start
+  paid: {
+    type: Boolean,
+    required: true,
+    default: true
+  },
+  lastPaymentDate: {
+    type: Date,
+    required: false,
+  },
+  expirePayementDate: {
+    type: Date,
+    required: false,
+  },
+  //payement info end
   image: {
     type: String,
     required: true,

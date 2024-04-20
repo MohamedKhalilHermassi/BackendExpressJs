@@ -1,7 +1,7 @@
 {
     "mongo":{
 
-        "uri": "mongodb://mongodb:27017/elkindy"
+        "uri": "mongodb://127.0.0.1:27017/elkindy"
     },
     "token":{
         "secret":"Elkindy-secret-key"
@@ -13,6 +13,10 @@
     "email":{
         "email":"elfadanes@gmail.com",
         "pwd":"dkztciotkzncaxwi"
+    },
+    "elkindy":{
+        "email":"elkindyschool1@gmail.com",
+        "pwd":"khalil123@"
     },
     "twilio":{
         "id":"ACe04daf6bad40055ff4b3d133197085fd",
