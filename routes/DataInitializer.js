@@ -18,7 +18,8 @@ async function createAdminUserIfNotExists() {
           birthday: '1999-01-01',
           image: "uploads\\administrateur.png",
           status: true,
-          verificationCode:null
+          verificationCode:null,
+          level : 7,
         });
   
         await newUser.save();
