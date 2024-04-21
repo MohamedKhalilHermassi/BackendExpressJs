@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const User = require('../models/user')
+const Course = require('../models/course')
+
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const multer = require('multer')
@@ -49,7 +51,7 @@ router.post('/login', async (req, res) => {
         {
           user.paid=false;
         }
-        const token = jwt.sign({ email: user.email, role: user.role, id:user.id,paid: user.paid,expirePaid:user.expirePayementDate }, config.token.secret, { expiresIn: '1h' });
+        const token = jwt.sign({ email: user.email, role: user.role, id:user.id,paid: user.paid,expirePaid:user.expirePayementDate,level: user.level }, config.token.secret, { expiresIn: '1h' });
         res.json({ token });
       }
     } catch (err) {
@@ -76,6 +78,14 @@ router.get('/teachers',async (req, res, next) => {
     res.status(500).json({ message: err.message })
   }
 });
+router.get('/students',async (req, res, next) => {
+  try {
+    const users = await User.find({role:'Student'})
+    res.json(users)
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+});
 
 // Getting One
 router.get('/OneUser/:email',authenticateToken, getuser, (req, res) => {
@@ -85,67 +95,118 @@ router.get('/OneUser/:email',authenticateToken, getuser, (req, res) => {
 // Creating one
 router.post('/register', upload.single('image'), async (req, res) => {
   try {
-      // Check if email already exists
-      const existingUser = await User.findOne({ email: req.body.email });
-      if (existingUser) {
-          return res.status(302).json({ message: 'Email already exists' });
-      }
+    // Check if email already exists
+    const existingUser = await User.findOne({ email: req.body.email });
+    if (existingUser) {
+      return res.status(302).json({ message: 'Email already exists' });
+    }
 
-      
-      const verificationCode = Math.floor(100000 + Math.random() * 900000); 
+    const verificationCode = Math.floor(100000 + Math.random() * 900000);
 
-      
-      const hashedPassword = await bcrypt.hash(req.body.password, 10);
-      const user = new User({
-          fullname: req.body.fullname,
-          email: req.body.email,
-          password: hashedPassword,
-          role: "Student",
-          level : req.body.level,
-          paid:false,
-          lastPaymentDate:null,
-          expirePayementDate:new Date(),
-          address: req.body.address,
-          phone: req.body.phone,
-          birthday: req.body.birthday,
-          image: req.file ? req.file.path : null,
-          verificationCode: verificationCode 
-      });
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
-      
-      await transporter.sendMail({
-          from: config.email.email,
-          to: req.body.email,
-          subject: 'Email Verification',
-          text: `Hello ${user.fullname}, your account is being set up. To complete your registration, please verify your account. Your verification code is: ${verificationCode}`
-        });
+    // Convert availableTime strings to Date objects
+    const availableTime = JSON.parse(req.body.availableTime).map(slot => ({
+      startTime: slot.startTime,
+      endTime:slot.endTime,
+      day: slot.day
+    }));
 
-         // Send SMS verification (optional)
-   // if (user.phone) { // Send only if phone number is provided
-   //   try {
-      //  const client = new twilio(config.twilio.id, config.twilio.token);
-    //    const message = `Hello ${user.fullname}, your account is being set up. To complete your registration, please verify your account. Your verification code is: ${verificationCode}`;
+    const user = new User({
+      fullname: req.body.fullname,
+      email: req.body.email,
+      password: hashedPassword,
+      role: "Student",
+      level: req.body.level,
+      paid: false,
+      lastPaymentDate: null,
+      expirePayementDate: new Date(),
+      address: req.body.address,
+      phone: req.body.phone,
+      birthday: req.body.birthday,
+      image: req.file ? req.file.path : null,
+      verificationCode: verificationCode,
+      availableTime: availableTime
+    });
 
-      //  await client.messages.create({
-       //   body: message,
-       //   to: `+216${user.phone}`, // Add country code to phone number
-       //   from: config.twilio.num,
-       // });
+    await transporter.sendMail({
+      from: config.email.email,
+      to: req.body.email,
+      subject: 'Email Verification',
+      text: `Hello ${user.fullname}, your account is being set up. To complete your registration, please verify your account. Your verification code is: ${verificationCode}`
+    });
 
-     //   console.log('SMS verification sent successfully');
-     // } catch (error) {
-     //   console.error('Error sending SMS verification:', error);
-    //  }
-   // }
-      
-      const newUser = await user.save();
-      
-      res.status(201).json(newUser);
+    // Affect student to course and available session
+    const course = await Course.findOne({ level: 'Level ' + user.level });
+    if (course) {
+      console.log(course);
+      user.courses.push(course._id);
+      course.students.push(user._id);
+      await course.save();
+    } else {
+      console.log('Course not found');
+    }
+
+    const newUser = await user.save();
+
+    res.status(201).json(newUser);
   } catch (err) {
-      res.status(400).json({ message: err.message });
+    res.status(400).json({ message: err.message });
   }
 });
 
+// MATCHING TWO USERS BASED ON AVAIABLE TIME 
+
+router.get('/match-available-time/:userId1/:userId2', async (req, res) => {
+  const { userId1, userId2 } = req.params;
+
+  try {
+    // Find the users by their IDs
+    const user1 = await User.findById(userId1);
+    const user2 = await User.findById(userId2);
+
+    // Check if both users exist
+    if (!user1 || !user2) {
+      return res.status(404).json({ message: 'One or both users not found' });
+    }
+
+    // Get the available time arrays for both users
+    const availableTime1 = user1.availableTime;
+    const availableTime2 = user2.availableTime;
+
+    // Find the overlapping time slots where both users are available
+    const matchingAvailableTimes = [];
+
+    availableTime1.forEach(time1 => {
+      availableTime2.forEach(time2 => {
+        if (
+          time1.day === time2.day &&
+          (
+            (time1.startTime >= time2.startTime && time1.startTime < time2.endTime) ||
+            (time2.startTime >= time1.startTime && time2.startTime < time1.endTime)
+          )
+        ) {
+          // Determine the overlapping time range
+          const start = time1.startTime >= time2.startTime ? time1.startTime : time2.startTime;
+          const end = time1.endTime <= time2.endTime ? time1.endTime : time2.endTime;
+
+          matchingAvailableTimes.push({
+            startTime: start,
+            endTime: end,
+            day: time1.day,
+            _id: time1._id // You can choose which ID to include
+          });
+        }
+      });
+    });
+
+    res.json({ matchingAvailableTimes });
+  } catch (error) {
+    res.status(500).json({ message: error });
+  }
+});
+
+// verify
 router.post('/verify-user', async (req, res) => {
   const { email, verificationCode } = req.body;
 
@@ -307,6 +368,11 @@ router.put('/BanUser/:email',authenticateToken ,authorizeUser('admin'),getuser, 
 // Creating teatcher
 router.post('/addingtetcher', authenticateToken ,authorizeUser('admin'),upload.single('image'), async (req, res) => {
   try {
+    const availableTime = JSON.parse(req.body.availableTime).map(slot => ({
+      startTime: slot.startTime,
+      endTime:slot.endTime,
+      day: slot.day
+    }));
       const existingUser = await User.findOne({ email: req.body.email });
       if (existingUser) {
           return res.status(302).json({ message: 'Email already exists' });
@@ -321,7 +387,8 @@ router.post('/addingtetcher', authenticateToken ,authorizeUser('admin'),upload.s
           phone: req.body.phone,
           level:7,
           birthday: req.body.birthday,
-          image: req.file ? req.file.path : null
+          image: req.file ? req.file.path : null,
+          availableTime:availableTime
          
       });
 

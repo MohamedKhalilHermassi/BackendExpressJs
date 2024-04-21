@@ -74,6 +74,8 @@ const userSchema = new mongoose.Schema({
   products: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
   books: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }],
 
+  availableTime: [{ startTime: String, endTime: String , day: String}],
+  
   orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }],
   sessions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Session' }],
   courses: [{type: mongoose.Schema.Types.ObjectId, ref: 'Course'}],

@@ -13,7 +13,7 @@ router.get('/', async(req, res, next) => {
 })
 
 router.get('/:id', async(req, res, next) => {
-    const course = await Course.findById(req.params.id);
+    const course = await Course.findById(req.params.id).populate('students').populate('teacher');
     res.json(course);
 })
 
@@ -83,6 +83,36 @@ router.put('/enroll/:courseid/:studentid', async (req, res, next) => {
     res.json({message: "you have enrolled into this course"});
 
 });
+router.put('/unenroll/:courseid/:studentid', async (req, res, next) => {
+    try {
+        // Find the course by ID
+        const course = await Course.findById(req.params.courseid);
+        if (!course) {
+            return res.status(404).json({ message: "Course not found" });
+        }
+
+        // Remove the student from the course's students array
+        course.students = course.students.filter(studentId => studentId !== req.params.studentid);
+        await course.save();
+
+        // Find the student by ID
+        const student = await user.findById(req.params.studentid);
+        if (!student) {
+            return res.status(404).json({ message: "Student not found" });
+        }
+
+        // Remove the course from the student's courses array
+        student.courses = student.courses.filter(courseId => courseId !== req.params.courseid);
+        await student.save();
+
+        // Respond with success message
+        res.json({ message: "Student unenrolled from the course successfully" });
+    } catch (error) {
+        console.error("Error unenrolling student from course:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
 
 // find my courses as a teacher
 
