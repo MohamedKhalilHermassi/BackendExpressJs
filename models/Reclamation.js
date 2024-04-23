@@ -6,6 +6,7 @@ const reclamationSchema = new mongoose.Schema({
     files: [{ type: String }],
     typereclamtion:{type:String, enum:['techniques','administrative','Communication','other']},
     otherreclamtion:{type:String},
+    resopnseReclamtion:{type:String},
     status: { type: String, enum: ['pending', 'resolved'],default: 'pending' } 
   });
   

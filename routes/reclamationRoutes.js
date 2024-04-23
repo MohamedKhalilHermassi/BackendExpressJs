@@ -79,7 +79,7 @@ router.get('/Allreclamtions/:email', authenticateToken, async (req, res) => {
 // Getting all
 router.get('/Allreclamtions/', authenticateToken,authorizeUser('admin'), async (req, res) => {
   try {
-    const reclamations = await Reclamation.find();
+    const reclamations = await Reclamation.find().populate('user');
     res.json(reclamations);
   } catch (er) {
     res.status(500).json({ message: er.message });
@@ -132,6 +132,7 @@ router.post('/updateReclamation', authenticateToken, upload.array('images'), asy
 router.post('/resolving/:id',authenticateToken , async (req, res) => {
   try {
       let _id = req.params.id;
+      let resp=req.body.resp;
       let reclamation = await Reclamation.findById({ _id });
      
       if (reclamation == null) {
@@ -143,19 +144,26 @@ router.post('/resolving/:id',authenticateToken , async (req, res) => {
           return res.status(404).json({ message: 'Cannot find user' });
         } 
         reclamation.status='resolved';
+        reclamation.resopnseReclamtion=resp;
         await transporter.sendMail({
           from: config.email.email,
           to: user.email,
           subject: 'Reclamation Resolved',
-          text: `Dear ${user.fullname},
-
-          We are pleased to inform you that your complaint has been successfully resolved. We have investigated your problem and taken the necessary steps to resolve it.
-          
-          If you have any further questions or concerns, please feel free to contact us at any time. We are here to help you.
-          
-          Sincerely,
-          El kindy`
-        });
+          html: `
+          <html>
+            <body>
+              <div style="text-align: center;">
+                <img src="https://i.postimg.cc/tTwcJth6/271796769-2289709331167054-5184032199602093363-n.jpg" alt="Header Image">
+              </div>
+              <div>
+                <h2>Dear ${user.fullname}</h2>
+                <p>${resp}</p>
+                <p>Sincerely,</p>
+                <p>El kindy</p>
+              </div>
+            </body>
+          </html>
+        `});
         await reclamation.save();
         res.status(200).json({ message: 'Reclamation updated successfully' });
   } catch (err) {
