@@ -62,9 +62,16 @@ router.post('/add-product', upload.single('image'),authenticateToken , async (re
 
 router.get('/get-products',async(req,res)=>{
 try{
-
-const products = await product.find();
-res.status(200).json(products);
+  const pageSize = 8;
+  const page = parseInt(req.query.page || "0");
+  const total = await product.countDocuments({});
+  const products = await product.find()
+  .limit(pageSize)
+  .skip(pageSize*page);
+  res.status(200).json({
+    totalPages : Math.ceil(total / pageSize),
+    products
+  });
 
 
 }catch(err)
