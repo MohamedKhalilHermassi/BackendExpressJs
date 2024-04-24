@@ -59,6 +59,27 @@ router.post('/login', async (req, res) => {
     }
   });
 
+  router.post('/Faciallogin', async (req, res) => {
+    const  email  = req.body.email;
+  
+    try {
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(400).json({ message: 'Invalid email or password' });
+      }else if (user.status==false) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+      else if (user.verificationCode!=null) {
+        return res.status(401).json({ message: 'Please verify your account' });
+      } else {
+        const token = jwt.sign({ email: user.email, role: user.role, id:user.id }, config.token.secret, { expiresIn: '1h' });
+        res.json({ token });
+      }
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
+
 // Getting all
 router.get('/AllUsers',authenticateToken,authorizeUser('admin'), async (req, res) => {
   try {
@@ -88,10 +109,51 @@ router.get('/students',async (req, res, next) => {
 });
 
 // Getting One
-router.get('/OneUser/:email',authenticateToken, getuser, (req, res) => {
+router.get('/OneUser/:email', getuser, (req, res) => {
   res.json(res.user)
 })
+//list students
+router.get('/ListAllstudents',authenticateToken,authorizeUser('teacher'), async (req, res) => {
+  try {
+    const students = await User.find({ role: 'Student' });
+    res.json(students);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+//invite meet
+router.post('/send-emails', async (req, res) => {
+  const { emails, url, date , name } = req.body; 
 
+  try {
+    for (const email of emails) {
+      const user = await User.findOne({ email:email });
+      await transporter.sendMail({
+        from: config.email.email,
+        to: email,
+        subject: 'Join Meet',
+        html: `
+        <html>
+          <body>
+            <div style="text-align: center;">
+              <img src="https://i.postimg.cc/tTwcJth6/271796769-2289709331167054-5184032199602093363-n.jpg" alt="Header Image">
+            </div>
+            <div>
+              <h2>Hello ${user.fullname},</h2>
+              <p>you  have a meet to join on the  ${date} , with teacher  ${name}</p>
+              <p>Please be in time</p>
+              <p>Here's the url to join <a href="${url}">${url}</a></p>
+            </div>
+          </body>
+        </html>
+      `});
+    }
+
+    res.status(200).json({ message: 'Emails sent successfully!' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 // Creating one
 router.post('/register', upload.single('image'), async (req, res) => {
   try {
@@ -111,6 +173,8 @@ router.post('/register', upload.single('image'), async (req, res) => {
       endTime:slot.endTime,
       day: slot.day
     }));
+
+      
 
     const user = new User({
       fullname: req.body.fullname,
@@ -133,8 +197,20 @@ router.post('/register', upload.single('image'), async (req, res) => {
       from: config.email.email,
       to: req.body.email,
       subject: 'Email Verification',
-      text: `Hello ${user.fullname}, your account is being set up. To complete your registration, please verify your account. Your verification code is: ${verificationCode}`
-    });
+      html: `
+      <html>
+        <body>
+          <div style="text-align: center;">
+            <img src="https://i.postimg.cc/tTwcJth6/271796769-2289709331167054-5184032199602093363-n.jpg" alt="Header Image">
+          </div>
+          <div>
+            <h2>Hello ${user.fullname},</h2>
+            <p>Your account is being set up. To complete your registration, please verify your account.</p>
+            <p>Your verification code is: ${user.verificationCode}</p>
+          </div>
+        </body>
+      </html>
+    `});
 
     // Affect student to course and available session
     const course = await Course.findOne({ level: 'Level ' + user.level });
@@ -239,8 +315,19 @@ router.post('/forgetpassword', async (req, res) => {
         from: config.email.email,
         to: req.body.email,
         subject: 'Forgot Password',
-        text: `Hello ${user.fullname},  Your verification code is: ${verificationCode}`
-      });
+        html: `
+        <html>
+          <body>
+            <div style="text-align: center;">
+              <img src="https://i.postimg.cc/tTwcJth6/271796769-2289709331167054-5184032199602093363-n.jpg" alt="Header Image">
+            </div>
+            <div>
+              <h2>Hello ${user.fullname},</h2>
+              <p>Your verification code is: ${verificationCode}</p>
+            </div>
+          </body>
+        </html>
+      `});
 
        // Send SMS verification (optional)
  // if (user.phone) { // Send only if phone number is provided
@@ -350,15 +437,37 @@ router.put('/BanUser/:email',authenticateToken ,authorizeUser('admin'),getuser, 
         from: config.email.email,
         to: res.user.email,
         subject: 'Revoking your ban',
-        text: `Your account has been reactivated. You can now access your account again.`
-      });
+        html: `
+        <html>
+          <body>
+            <div style="text-align: center;">
+              <img src="https://i.postimg.cc/tTwcJth6/271796769-2289709331167054-5184032199602093363-n.jpg" alt="Header Image">
+            </div>
+            <div>
+              <h2>Hello ${res.user.fullname},</h2>
+              <p>Your account has been reactivated. You can now access your account again.</p>
+            </div>
+          </body>
+        </html>
+      `});
     }else{
       await transporter.sendMail({
         from: config.email.email,
         to: res.user.email,
         subject: 'Your account has been banned',
-        text: `Your account has been banned for violating the terms of service.`
-      });
+        html: `
+        <html>
+          <body>
+            <div style="text-align: center;">
+              <img src="https://i.postimg.cc/tTwcJth6/271796769-2289709331167054-5184032199602093363-n.jpg" alt="Header Image">
+            </div>
+            <div>
+              <h2>Hello ${res.user.fullname},</h2>
+              <p>Your account has been banned for violating the terms of service.</p>
+            </div>
+          </body>
+        </html>
+      `});
     }
     res.json(updatedUser)
   } catch (err) {
@@ -397,9 +506,21 @@ router.post('/addingtetcher', authenticateToken ,authorizeUser('admin'),upload.s
           from: config.email.email,
           to: req.body.email,
           subject: 'Account Set up',
-          text: `Hello ${user.fullname}, your account is ready. here's your information to login in, email : ${req.body.email} , password :  ${req.body.password} `
-        });
-      
+          html: `
+          <html>
+            <body>
+              <div style="text-align: center;">
+                <img src="https://i.postimg.cc/tTwcJth6/271796769-2289709331167054-5184032199602093363-n.jpg" alt="Header Image">
+              </div>
+              <div>
+                <h2>Hello ${user.fullname},</h2>
+                <p>your account is ready. here's your information to login in :</p>
+                <p>Email:  ${req.body.email}</p>
+                <p>Password:  ${req.body.password}</p>
+              </div>
+            </body>
+          </html>
+        `});
       const newUser = await user.save();
       
       res.status(201).json(newUser);
