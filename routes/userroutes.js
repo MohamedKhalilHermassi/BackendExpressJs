@@ -94,7 +94,48 @@ router.get('/teachers',async (req, res, next) => {
 router.get('/OneUser/:email', getuser, (req, res) => {
   res.json(res.user)
 })
+//list students
+router.get('/ListAllstudents',authenticateToken,authorizeUser('teacher'), async (req, res) => {
+  try {
+    const students = await User.find({ role: 'Student' });
+    res.json(students);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+//invite meet
+router.post('/send-emails', async (req, res) => {
+  const { emails, url, date , name } = req.body; 
 
+  try {
+    for (const email of emails) {
+      const user = await User.findOne({ email:email });
+      await transporter.sendMail({
+        from: config.email.email,
+        to: email,
+        subject: 'Join Meet',
+        html: `
+        <html>
+          <body>
+            <div style="text-align: center;">
+              <img src="https://i.postimg.cc/tTwcJth6/271796769-2289709331167054-5184032199602093363-n.jpg" alt="Header Image">
+            </div>
+            <div>
+              <h2>Hello ${user.fullname},</h2>
+              <p>you  have a meet to join on the  ${date} , with teacher  ${name}</p>
+              <p>Please be in time</p>
+              <p>Here's the url to join <a href="${url}">${url}</a></p>
+            </div>
+          </body>
+        </html>
+      `});
+    }
+
+    res.status(200).json({ message: 'Emails sent successfully!' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 // Creating one
 router.post('/register', upload.single('image'), async (req, res) => {
   try {
@@ -328,7 +369,7 @@ router.put('/BanUser/:email',authenticateToken ,authorizeUser('admin'),getuser, 
               <img src="https://i.postimg.cc/tTwcJth6/271796769-2289709331167054-5184032199602093363-n.jpg" alt="Header Image">
             </div>
             <div>
-              <h2>Hello ${user.fullname},</h2>
+              <h2>Hello ${res.user.fullname},</h2>
               <p>Your account has been reactivated. You can now access your account again.</p>
             </div>
           </body>
@@ -346,7 +387,7 @@ router.put('/BanUser/:email',authenticateToken ,authorizeUser('admin'),getuser, 
               <img src="https://i.postimg.cc/tTwcJth6/271796769-2289709331167054-5184032199602093363-n.jpg" alt="Header Image">
             </div>
             <div>
-              <h2>Hello ${user.fullname},</h2>
+              <h2>Hello ${res.user.fullname},</h2>
               <p>Your account has been banned for violating the terms of service.</p>
             </div>
           </body>
