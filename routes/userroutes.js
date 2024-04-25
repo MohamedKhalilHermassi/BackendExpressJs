@@ -109,7 +109,7 @@ router.get('/teachers',async (req, res, next) => {
 });
 router.get('/students',async (req, res, next) => {
   try {
-    const users = await User.find({role:'Student'})
+    const users = await User.find({role:'Student'}).populate('courses');
     res.json(users)
   } catch (err) {
     res.status(500).json({ message: err.message })
@@ -560,6 +560,16 @@ router.get('/user', authenticateToken, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+router.get('/students/:id/courses', async (req, res) => {
+  try {
+    const userid = req.params.id;
+    const user = await User.findById(userid).populate('courses');
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 
 
 // Route to get a user with their products
