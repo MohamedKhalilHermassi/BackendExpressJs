@@ -62,9 +62,16 @@ router.post('/add-product', upload.single('image'),authenticateToken , async (re
 
 router.get('/get-products',async(req,res)=>{
 try{
-
-const products = await product.find();
-res.status(200).json(products);
+  const pageSize = 6;
+  const page = parseInt(req.query.page || "0");
+  const total = await product.countDocuments({});
+  const products = await product.find({sold:false})
+  .limit(pageSize)
+  .skip(pageSize*page);
+  res.status(200).json({
+    totalPages : Math.round(total / pageSize),
+    products
+  });
 
 
 }catch(err)
@@ -73,6 +80,11 @@ res.status(200).json(products);
 }
 })
 
+router.get('/getproductbyid/:id', async (req, res)=>{
+  const Product = await product.findById(req.params.id).populate('produitsSimilaires');
+
+  res.json(Product);
+})
 
 // PUT route to update product availability
 router.put('/products/:productId',authenticateToken ,authorizeUser('admin'), async (req, res) => {
