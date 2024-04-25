@@ -47,7 +47,8 @@ const Product = new Schema({
     required: true,
   },
   // Many to one with user
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  produitsSimilaires:[{type: mongoose.Schema.Types.ObjectId, ref: 'Product'}]
 });
 
 module.exports = mongoose.model('Product', Product);

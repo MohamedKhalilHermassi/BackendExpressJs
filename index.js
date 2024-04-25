@@ -63,7 +63,7 @@ const locationRouter = require('./routes/locationRouter');
 const eventRouter = require('./routes/eventRoute');
 const bookRouter = require('./routes/bookRoute');
 const noteRouter = require('./routes/noteRoute');
-const cronFiltrageCollaboratif = require('./shared/cron');
+const {cronFiltrageCollaboratif, cronBaseSurLeContenu} = require('./shared/cron');
 
 app.use('/users', usersRouter)
 const productRouter = require('./routes/productRoute')
@@ -87,7 +87,9 @@ app.use('/market',productRouter)
 app.use('/uploads', express.static('uploads'));
 app.use('/orders', orderRouter);
 app.use('/notes', noteRouter);
+
 cronFiltrageCollaboratif();
+cronBaseSurLeContenu();
 
 
 app.use((req, res, next) => {
