@@ -50,6 +50,19 @@ const Event = new Schema({
         type: String,
         required: false,
     },
+    ratings: [
+        {
+          user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+          },
+          rating: {
+            type: Number,
+            min: 1,
+            max: 5,
+          },
+        },
+      ],
     users: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'

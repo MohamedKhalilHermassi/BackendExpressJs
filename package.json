@@ -23,6 +23,8 @@
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.11",
     "path": "^0.12.7",
+    "pdfkit": "^0.15.0",
+    "qrcode": "^1.5.3",
     "readable-stream": "^4.5.2",
     "socket.io": "^4.7.4",
     "supertest": "^6.3.4",
