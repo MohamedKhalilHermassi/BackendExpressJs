@@ -7,7 +7,7 @@
         "secret":"Elkindy-secret-key"
     },
     "cors":{
-        "options":"http://localhost:5173"
+        "options":"elkindyprod.netlify.app"
 
     },
     "email":{
