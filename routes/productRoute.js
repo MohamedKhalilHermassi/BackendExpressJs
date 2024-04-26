@@ -65,7 +65,7 @@ try{
   const pageSize = 6;
   const page = parseInt(req.query.page || "0");
   const total = await product.countDocuments({});
-  const products = await product.find({sold:false})
+  const products = await product.find()
   .limit(pageSize)
   .skip(pageSize*page);
   res.status(200).json({
