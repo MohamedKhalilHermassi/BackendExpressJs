@@ -8,6 +8,7 @@ const cors = require('cors');
 const path = require('path');
 const http = require('http');
 const { createAdminUserIfNotExists } = require('./routes/DataInitializer');
+require("dotenv").config();
 
 const app = express();
 
@@ -63,6 +64,7 @@ const connectDB = require("./connectMongo");
 connectDB();
 
 
+
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.json())
 const courseRouter = require('./routes/courseRoute');
@@ -76,8 +78,6 @@ const bookRouter = require('./routes/bookRoute')
 const paymentRouter = require('./routes/payementRoute')
 const messageRouter = require('./routes/messageRoute')
 const transactionRouter = require('./routes/transactionRoute')
-const noteRouter = require('./routes/noteRoute');
-const {cronFiltrageCollaboratif, cronBaseSurLeContenu} = require('./shared/cron');
 
 app.use('/users', usersRouter)
 const productRouter = require('./routes/productRoute')
@@ -95,18 +95,13 @@ app.use('/classrooms', classroomRouter);
 app.use('/exams', examRouter);
 app.use('/sessions', sessionRouter);
 app.use('/locations', locationRouter);
-
 //gestion magasin
 app.use('/market',productRouter)
 app.use('/uploads', express.static('uploads'));
 app.use('/orders', orderRouter);
 app.use('/payement',paymentRouter);
-app.use('/api/messages', messageRouter);
-app.use('/transaction', transactionRouter);
-app.use('/notes', noteRouter);
-
-cronFiltrageCollaboratif();
-cronBaseSurLeContenu();
+app.use('/api/messages', messageRouter); 
+app.use('/transaction', transactionRouter); 
 
 
 app.use((req, res, next) => {
