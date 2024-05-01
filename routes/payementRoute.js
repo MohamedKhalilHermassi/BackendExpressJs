@@ -32,6 +32,45 @@ const payload={
         
 
 })
+
+router.post('/flouciproduct', async (req,res)=>{
+
+    const url = "https://developers.flouci.com/api/generate_payment"
+    const payload={
+        "app_token": "8980a869-a509-49d2-bd40-858c75cedad1",
+        "app_secret": process.env.FLOUCI_SECRET,
+        "accept_card":"true",
+        "amount":req.body.amount,
+        "success_link": "http://localhost:5173/productSuccess",
+        "fail_link": "http://localhost:5173/fail",
+        "session_timeout_secs": 1200,
+        "developer_tracking_id": process.env.DEVELOPER_TRACKING_ID
+      }
+      
+    
+      await axios.post(url,payload).then((result)=>res.send(result.data)).catch((err)=>console.log(err));
+            
+    
+    })
+router.post('/floucibook', async (req,res)=>{
+
+    const url = "https://developers.flouci.com/api/generate_payment"
+    const payload={
+        "app_token": "8980a869-a509-49d2-bd40-858c75cedad1",
+        "app_secret": process.env.FLOUCI_SECRET,
+        "accept_card":"true",
+        "amount":req.body.amount,
+        "success_link": "http://localhost:5173/bookSuccess",
+        "fail_link": "http://localhost:5173/fail",
+        "session_timeout_secs": 1200,
+        "developer_tracking_id": process.env.DEVELOPER_TRACKING_ID
+      }
+      
+    
+      await axios.post(url,payload).then((result)=>res.send(result.data)).catch((err)=>console.log(err));
+            
+    
+    })
 router.get('/verify/:id', async (req,res)=>{
 
     const id = req.params.id;
