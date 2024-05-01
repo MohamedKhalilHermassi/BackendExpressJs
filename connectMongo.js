@@ -7,8 +7,10 @@ const connectDB = async () => {
         console.log("Connect to MongoDB successfully")
         const db = mongoose.connection
         db.on('error', (error) => console.error(error))
-        db.once('open', () => {console.log('Connected to Database')
-        createAdminUserIfNotExists()
+        db.once('open', () => {
+            createAdminUserIfNotExists()
+            console.log('Connected to Database')
+        
 });
     } catch (error) {
         console.log("Connect failed " + error.message )

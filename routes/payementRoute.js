@@ -3,6 +3,9 @@ const router = express.Router();
 const user = require('../models/user');
 const config = require('../database/dbConfig.json');
 const nodemailer = require('nodemailer');
+const dotenv = require('dotenv');
+const { default: axios } = require('axios');
+dotenv.config()
 let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -10,6 +13,49 @@ let transporter = nodemailer.createTransport({
         pass: config.email.pwd
     }
   });
+router.post('/flouci', async (req,res)=>{
+
+const url = "https://developers.flouci.com/api/generate_payment"
+const payload={
+    "app_token": "8980a869-a509-49d2-bd40-858c75cedad1",
+    "app_secret": process.env.FLOUCI_SECRET,
+    "accept_card":"true",
+    "amount":req.body.amount,
+    "success_link": "http://localhost:5173/success",
+    "fail_link": "http://localhost:5173/fail",
+    "session_timeout_secs": 1200,
+    "developer_tracking_id": process.env.DEVELOPER_TRACKING_ID
+  }
+  
+
+  await axios.post(url,payload).then((result)=>res.send(result.data)).catch((err)=>console.log(err));
+        
+
+})
+router.get('/verify/:id', async (req,res)=>{
+
+    const id = req.params.id;
+    const userid = req.params.userid;
+    const userfound = await user.findById(userid);
+
+    url = `https://developers.flouci.com/api/verify_payment/${id}`;
+
+    
+   const  headers = {
+  'Content-Type': 'application/json',
+  'apppublic': '8980a869-a509-49d2-bd40-858c75cedad1',
+  'appsecret': process.env.FLOUCI_SECRET
+}
+    axios.get(url,{headers:headers}).then((result)=>{
+        res.send(result.data)
+    
+    }).catch((err)=>console.log(err.message));
+
+    
+    })
+
+
+
 
 router.put('/pay', async (req, res) => {
     try {
