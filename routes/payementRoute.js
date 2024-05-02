@@ -21,7 +21,7 @@ const payload={
     "app_secret": process.env.FLOUCI_SECRET,
     "accept_card":"true",
     "amount":req.body.amount,
-    "success_link": "http://localhost:5173/success",
+    "success_link": "https://main--idyllic-malabi-e8aa4a.netlify.app/success",
     "fail_link": "http://localhost:5173/fail",
     "session_timeout_secs": 1200,
     "developer_tracking_id": process.env.DEVELOPER_TRACKING_ID
@@ -42,7 +42,7 @@ router.post('/floucievent', async (req,res)=>{
         "app_secret": process.env.FLOUCI_SECRET,
         "accept_card":"true",
         "amount":req.body.amount,
-        "success_link": "http://localhost:5173/successEvent",
+        "success_link": "https://main--idyllic-malabi-e8aa4a.netlify.app/successEvent",
         "fail_link": "http://localhost:5173/fail",
         "session_timeout_secs": 1200,
         "developer_tracking_id": process.env.DEVELOPER_TRACKING_ID
@@ -62,7 +62,7 @@ router.post('/flouciproduct', async (req,res)=>{
         "app_secret": process.env.FLOUCI_SECRET,
         "accept_card":"true",
         "amount":req.body.amount,
-        "success_link": "http://localhost:5173/productSuccess",
+        "success_link": "https://main--idyllic-malabi-e8aa4a.netlify.app/productSuccess",
         "fail_link": "http://localhost:5173/fail",
         "session_timeout_secs": 1200,
         "developer_tracking_id": process.env.DEVELOPER_TRACKING_ID
@@ -81,7 +81,7 @@ router.post('/floucibook', async (req,res)=>{
         "app_secret": process.env.FLOUCI_SECRET,
         "accept_card":"true",
         "amount":req.body.amount,
-        "success_link": "http://localhost:5173/bookSuccess",
+        "success_link": "https://main--idyllic-malabi-e8aa4a.netlify.app/bookSuccess",
         "fail_link": "http://localhost:5173/fail",
         "session_timeout_secs": 1200,
         "developer_tracking_id": process.env.DEVELOPER_TRACKING_ID
