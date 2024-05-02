@@ -38,7 +38,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "elkindyprod.netlify.app",
+    origin: "https://main--idyllic-malabi-e8aa4a.netlify.app",
     methods: ["GET", "POST"],
   },
 });
