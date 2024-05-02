@@ -153,7 +153,7 @@ router.post('/resolving/:id',authenticateToken , async (req, res) => {
           <html>
             <body>
               <div style="text-align: center;">
-                <img src="https://i.postimg.cc/tTwcJth6/271796769-2289709331167054-5184032199602093363-n.jpg" alt="Header Image">
+                <img src="https://firebasestorage.googleapis.com/v0/b/elkindy-5cf2d.appspot.com/o/271796769_2289709331167054_5184032199602093363_n.jpg?alt=media&token=a9b67aa0-5bec-4b7c-9d0c-8c341f17c087" alt="Header Image">
               </div>
               <div>
                 <h2>Dear ${user.fullname}</h2>
