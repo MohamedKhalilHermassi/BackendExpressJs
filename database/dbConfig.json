@@ -1,0 +1,22 @@
+{
+    "mongo":{
+
+        "uri": "mongodb://127.0.0.1/elkindy"
+    },
+    "token":{
+        "secret":"Elkindy-secret-key"
+    },
+    "cors":{
+        "options":"http://localhost:5173"
+
+    },
+    "email":{
+        "email":"elfadanes@gmail.com",
+        "pwd":"dkztciotkzncaxwi"
+    },
+    "twilio":{
+        "id":"ACe04daf6bad40055ff4b3d133197085fd",
+        "token":"9af40144ff0d1647745c84cb6a266ebb",
+        "num":"+14325355571"
+    }
+}
