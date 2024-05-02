@@ -33,6 +33,27 @@ const payload={
 
 })
 
+
+router.post('/floucievent', async (req,res)=>{
+
+    const url = "https://developers.flouci.com/api/generate_payment"
+    const payload={
+        "app_token": "8980a869-a509-49d2-bd40-858c75cedad1",
+        "app_secret": process.env.FLOUCI_SECRET,
+        "accept_card":"true",
+        "amount":req.body.amount,
+        "success_link": "http://localhost:5173/successEvent",
+        "fail_link": "http://localhost:5173/fail",
+        "session_timeout_secs": 1200,
+        "developer_tracking_id": process.env.DEVELOPER_TRACKING_ID
+      }
+      
+    
+      await axios.post(url,payload).then((result)=>res.send(result.data)).catch((err)=>console.log(err));
+            
+    
+    })
+
 router.post('/flouciproduct', async (req,res)=>{
 
     const url = "https://developers.flouci.com/api/generate_payment"
