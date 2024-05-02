@@ -59,13 +59,26 @@ router.post('/add-product', upload.single('image'),authenticateToken , async (re
 });
 
 
-
 router.get('/get-products',async(req,res)=>{
+  try{
+  
+  const products = await product.find();
+  res.status(200).json(products);
+  
+  
+  }catch(err)
+  {
+    res.status(400).send(err.message);
+  }
+  })
+
+  
+router.get('/get-paginated-products',async(req,res)=>{
 try{
   const pageSize = 6;
   const page = parseInt(req.query.page || "0");
   const total = await product.countDocuments({});
-  const products = await product.find()
+  const products = await product.find({sold:false, productAvailability: true})
   .limit(pageSize)
   .skip(pageSize*page);
   res.status(200).json({
