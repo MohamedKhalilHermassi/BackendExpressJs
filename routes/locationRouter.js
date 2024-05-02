@@ -11,7 +11,6 @@ router.post('/', async (req, res, next) => {
     const location = new Location({
         state : req.body.state,
         city : req.body.city,
-        address : req.body.address,
         lat: req.body.lat,
         lng: req.body.lng,
         numberOfFloors : req.body.numberOfFloors

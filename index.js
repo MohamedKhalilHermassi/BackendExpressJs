@@ -80,6 +80,7 @@ const messageRouter = require('./routes/messageRoute')
 const transactionRouter = require('./routes/transactionRoute')
 const noteRouter = require('./routes/noteRoute');
 const commentaireRouter = require('./routes/commentaireRoute');
+const {cronFiltrageCollaboratif, cronBaseSurLeContenu} = require('./shared/cron');
 
 
 app.use('/users', usersRouter)
@@ -108,6 +109,9 @@ app.use('/payement',paymentRouter);
 app.use('/api/messages', messageRouter); 
 app.use('/transaction', transactionRouter); 
 app.use('/notes', noteRouter);
+
+cronFiltrageCollaboratif();
+cronBaseSurLeContenu();
 
 
 app.use((req, res, next) => {
