@@ -61,30 +61,35 @@ router.delete("/delete/:id", async(req, res, next) => {
 });
 
 router.post('/register', async (req, res) => {
-    const { userId, eventId } = req.body;
+    const { userId, eventId, tickets } = req.body;
   
     try {
       const user = await User.findById(userId);
       const event = await Event.findById(eventId);
   
-      if (!user || !event) {
-        return res.status(404).json({ message: 'User or event not found' });
+      if (!user || !event || !tickets || !mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(eventId)) {
+        return res.status(404).json({ message: 'Invalid or missing user ID, event ID, or tickets' });
       }
-  
+      for (let i = 0; i < tickets; i++) {
       user.events.push(eventId);
       event.users.push(userId);
+      }
+      // Increase the number of participants by the number of tickets
+      event.participants += Number(tickets);
   
       await Promise.all([user.save(), event.save()]);
       
-    const ticketId = `${userId}-${eventId}-${new Date().getTime()}`;
+      const ticketPaths = [];
+      for (let i = 0; i < tickets; i++) {
+        const ticketId = `${userId}-${eventId}-${new Date().getTime()}-${i}`;
 
-    const qrCodeData = await QRCode.toDataURL(ticketId);
+        const qrCodeData = await QRCode.toDataURL(ticketId);
 
-    const doc = new PDFDocument();
+        const doc = new PDFDocument();
 
-    const ticketPath = `./tickets/${ticketId}.pdf`;
+        const ticketPath = `./tickets/${ticketId}.pdf`;
 
-    doc.pipe(fs.createWriteStream(ticketPath));
+        doc.pipe(fs.createWriteStream(ticketPath));
 
     doc.image('./elkindy_logo.jpg', 50, 50, { width: 150 });
     doc.fontSize(25).text('Event Ticket', 220, 50);
@@ -93,14 +98,20 @@ router.post('/register', async (req, res) => {
     doc.text(`Date: ${event.date.toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })}`, 50, 175);
     doc.text(`Location: ${event.location}`, 50, 200);
 
-    doc.text(`Name: ${user.fullname}`, 50, 250);
-    doc.text(`Email: ${user.email}`, 50, 275);
+    //doc.text(`Name: ${user.fullname}`, 50, 250);
+    //doc.text(`Email: ${user.email}`, 50, 275);
 
     doc.image(qrCodeData, 320, 150, { width: 200 });
 
     doc.fontSize(12).text('Please bring this ticket with you to the event.', 50, 350);
 
     doc.end();
+
+    ticketPaths.push({
+      filename: `${ticketId}.pdf`,
+      path: ticketPath
+    });
+  }
 
     let transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -133,12 +144,7 @@ router.post('/register', async (req, res) => {
 
       <p>Best regards,</p>
     </div>`, 
-      attachments: [
-        {
-          filename: `${ticketId}.pdf`,
-          path: ticketPath
-        }
-      ]
+      attachments: ticketPaths
     });
 
       return res.status(200).json({ message: 'Successfully registered for event' });
@@ -181,7 +187,17 @@ router.get('/user/:userId/events', async (req, res) => {
         return res.status(404).json({ message: 'Event not found' });
       }
   
-      return res.status(200).json(event.users);
+      // Create a new array of users with ticket counts
+      const usersWithTickets = event.users.map(user => {
+        const tickets = event.users.filter(u => u._id.toString() === user._id.toString()).length;
+        return { ...user._doc, tickets };
+      });
+  
+      // Remove duplicates
+      const uniqueUsersWithTickets = Array.from(new Set(usersWithTickets.map(user => user._id.toString())))
+        .map(id => usersWithTickets.find(user => user._id.toString() === id));
+  
+      return res.status(200).json(uniqueUsersWithTickets);
     } catch (error) {
       console.error('Error in /event/:eventId/users route:', error);
       return res.status(500).json({ message: 'Server error' });
