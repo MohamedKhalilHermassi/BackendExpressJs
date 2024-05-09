@@ -58,12 +58,9 @@ io.on('connection', (socket) => {
 
 
 
-
 const connectDB = require("./connectMongo");
 
 connectDB();
-
-
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.json())
@@ -80,6 +77,7 @@ const messageRouter = require('./routes/messageRoute')
 const transactionRouter = require('./routes/transactionRoute')
 const noteRouter = require('./routes/noteRoute');
 const commentaireRouter = require('./routes/commentaireRoute');
+const obserRouter = require('./routes/observationRoute');
 const {cronFiltrageCollaboratif, cronBaseSurLeContenu} = require('./shared/cron');
 
 
@@ -100,6 +98,7 @@ app.use('/exams', examRouter);
 app.use('/sessions', sessionRouter);
 app.use('/locations', locationRouter);
 app.use('/commentaires', commentaireRouter);
+app.use('/observations', obserRouter);
 
 //gestion magasin
 app.use('/market',productRouter)

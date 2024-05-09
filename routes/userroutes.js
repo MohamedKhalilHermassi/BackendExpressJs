@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const User = require('../models/user')
 const Course = require('../models/course')
-
+const Session = require('../models/session')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const multer = require('multer')
@@ -181,9 +181,12 @@ router.post('/register', upload.single('image'), async (req, res) => {
       endTime:slot.endTime,
       day: slot.day
     }));
-
+    const sessiongrouped = [];
       
-
+    if (req.body.groupsession!='')
+      {
+        sessiongrouped.push(req.body.groupsession);
+      }
     const user = new User({
       fullname: req.body.fullname,
       email: req.body.email,
@@ -194,11 +197,13 @@ router.post('/register', upload.single('image'), async (req, res) => {
       lastPaymentDate: null,
       expirePayementDate: new Date(),
       address: req.body.address,
+      favouriteInstrument: req.body.favouriteInstrument,
       phone: req.body.phone,
       birthday: req.body.birthday,
       image: req.file ? req.file.path : null,
       verificationCode: verificationCode,
-      availableTime: availableTime
+      availableTime: availableTime,
+      sessions: sessiongrouped
     });
 
     await transporter.sendMail({
@@ -219,7 +224,13 @@ router.post('/register', upload.single('image'), async (req, res) => {
         </body>
       </html>
     `});
-
+//AFFECT STUDENT TO SELECTED GROUP SESSION
+      if(req.body.groupsession!='')
+        {
+          const session = await Session.findById(req.body.groupsession);
+          session.students.push(user._id);
+          await session.save();
+        }
     // Affect student to course and available session
     const course = await Course.findOne({ level: 'Level ' + user.level });
     if (course) {

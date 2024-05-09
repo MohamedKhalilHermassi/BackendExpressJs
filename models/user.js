@@ -56,7 +56,8 @@ const userSchema = new mongoose.Schema({
   },
   level: {
     type: Number,
-    required: true
+    default: null,
+    required: false
   },
   notes: [
     {
@@ -70,13 +71,17 @@ const userSchema = new mongoose.Schema({
       }
     }
   ],
-
+  favouriteInstrument: {
+    type: [String], 
+    default: []
+  },
   products: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
   recommendedProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
   books: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }],
 
   availableTime: [{ startTime: String, endTime: String , day: String}],
-  
+  observations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Observation' }],
+
   orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }],
   sessions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Session' }],
   courses: [{type: mongoose.Schema.Types.ObjectId, ref: 'Course'}],

@@ -28,6 +28,10 @@ const Session = new Schema({
         type: Number,
         required: true,
     },
+    capacity: {
+        type: Number,
+        required: true,
+    },
     students: [{
         type: Schema.Types.ObjectId,
         ref: 'User'

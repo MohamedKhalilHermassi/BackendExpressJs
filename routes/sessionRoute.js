@@ -22,9 +22,21 @@ router.get('/', async(req, res, next) => {
     }).populate('course');
     res.json(couSessionrses);
 })
+//FIND BY LEVEL && CAPACITY
+router.get('/getbylevel/:level', async(req, res, next) => {
+  const session = await Session.find({level:req.params.level});
+
+  res.json(session);
+})
+//FIND BY ID
+router.get('/teacher/:id', async(req, res, next) => {
+  const id = req.params.id;
+  const session = await Session.find({teacher:id});
+  res.json(session);
+})
 //FIND BY ID
 router.get('/:id', async(req, res, next) => {
-    const session = await Session.findById(req.params.id);
+    const session = await Session.findById(req.params.id).populate('students');
     res.json(session);
 })
 // DELETE
@@ -215,6 +227,7 @@ router.post('/add', async (req, res, next) => {
       teacher: req.body.teacher,
       classroom: req.body.classroom,
       level: req.body.level,
+      capacity:req.body.capacity,
       students: []
     });
 
