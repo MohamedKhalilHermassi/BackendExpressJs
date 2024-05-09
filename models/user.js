@@ -80,7 +80,6 @@ const userSchema = new mongoose.Schema({
   books: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }],
 
   availableTime: [{ startTime: String, endTime: String , day: String}],
-  observations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Observation' }],
 
   orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }],
   sessions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Session' }],
